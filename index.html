@@ -651,6 +651,27 @@ function getWinner(r) {
 
 function getTotal(r) { return r.votes.reduce((s, v) => s + v, 0); }
 
+function lerpColor(hexA, hexB, t) {
+  const a = parseInt(hexA.slice(1), 16), b = parseInt(hexB.slice(1), 16);
+  const r = Math.round(((a >> 16) & 0xff) * (1 - t) + ((b >> 16) & 0xff) * t);
+  const g = Math.round(((a >> 8)  & 0xff) * (1 - t) + ((b >> 8)  & 0xff) * t);
+  const v = Math.round((a         & 0xff) * (1 - t) + (b         & 0xff) * t);
+  return '#' + [r, g, v].map(x => x.toString(16).padStart(2, '0')).join('');
+}
+
+const SCORE_MIN = 0.28, SCORE_MAX = 0.68;
+
+function getZoneColor(winner, r) {
+  if (!r) return winner.color;
+  const total = getTotal(r);
+  if (!total) return winner.color;
+  const score = getVoices(r, winner) / total;
+  const t = Math.max(0, Math.min(1, (score - SCORE_MIN) / (SCORE_MAX - SCORE_MIN)));
+  if (winner.idx === 4) return lerpColor('#BBDEFB', '#1565C0', t); // Moudenc : bleu clair → bleu foncé
+  if (winner.idx === 8) return lerpColor('#FFCDD2', '#B71C1C', t); // Piquemal : rouge clair → rouge foncé
+  return winner.color;
+}
+
 function pct(v, total) {
   if (!total) return 0;
   return Math.round((v / total) * 1000) / 10;
@@ -847,7 +868,7 @@ function renderGeoJSON(geojson) {
   geojsonLayer = L.geoJSON(geojson, {
     style: feature => {
       const winner = feature._winner;
-      const color  = winner ? winner.color : '#ccc';
+      const color  = winner ? getZoneColor(winner, feature.properties.r) : '#ccc';
       return {
         fillColor:   color,
         fillOpacity: 0.55,
