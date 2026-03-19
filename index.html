@@ -603,6 +603,51 @@
 
     .vs-bar-fill { height: 100%; border-radius: 2px; }
 
+    .vs-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .vs-header-spacer {
+      width: 8px;
+      flex-shrink: 0;
+    }
+
+    .vs-header-name {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      width: 82px;
+      flex-shrink: 0;
+    }
+
+    .vs-header-bar { flex: 1; }
+
+    .vs-header-pct {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      width: 34px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .vs-header-votes {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      width: 44px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
     .vs-pct {
       font-size: 10px;
       color: var(--muted);
@@ -671,6 +716,13 @@
 <!-- Votes summary -->
 <div id="votes-summary">
   <div class="vs-title">Voix par liste</div>
+  <div class="vs-header">
+    <div class="vs-header-spacer"></div>
+    <div class="vs-header-name">Liste</div>
+    <div class="vs-header-bar"></div>
+    <div class="vs-header-pct">Score</div>
+    <div class="vs-header-votes">Voix</div>
+  </div>
   <div id="vs-rows"></div>
 </div>
 
