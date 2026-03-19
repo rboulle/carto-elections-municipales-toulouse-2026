@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Municipales Toulouse 2026 · 1er Tour</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #f4f1ec;
+      --surface: #ffffff;
+      --border:  #d8d2c8;
+      --text:    #1a1714;
+      --muted:   #776e63;
+      --accent:  #b5470e;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Source Sans 3', 'Helvetica Neue', Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    /* ── Header ─────────────────────────────────────────────── */
+    #header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 2px;
+      font-weight: 600;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(18px, 2.2vw, 28px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    /* Global stats */
+    #global-stats {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .stat-pill {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .stat-pill .val {
+      font-size: 18px;
+      font-weight: 600;
+      display: block;
+      color: var(--text);
+      line-height: 1.1;
+    }
+
+    .stat-pill .lbl {
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── Map ─────────────────────────────────────────────────── */
+    #map {
+      position: fixed;
+      inset: 0;
+      top: 61px; /* below header */
+      z-index: 1;
+    }
+
+    /* Leaflet overrides */
+    .leaflet-container { background: var(--bg); }
+    .leaflet-control-zoom {
+      border: 1px solid var(--border) !important;
+      border-radius: 4px !important;
+      overflow: hidden;
+    }
+    .leaflet-control-zoom a {
+      background: var(--surface) !important;
+      color: var(--text) !important;
+      border: none !important;
+      border-bottom: 1px solid var(--border) !important;
+      width: 28px !important;
+      height: 28px !important;
+      line-height: 26px !important;
+      font-size: 16px !important;
+    }
+    .leaflet-control-zoom a:last-child { border-bottom: none !important; }
+    .leaflet-control-zoom a:hover { background: var(--bg) !important; }
+    .leaflet-control-attribution { display: none; }
+
+    /* ── Legend ──────────────────────────────────────────────── */
+    #legend {
+      position: fixed;
+      bottom: 20px;
+      left: 14px;
+      z-index: 500;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 12px 14px;
+      min-width: 190px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .legend-title {
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 9px;
+      font-weight: 600;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 5px;
+      cursor: pointer;
+    }
+
+    .legend-item:last-child { margin-bottom: 0; }
+    .legend-item:hover .legend-name { color: var(--accent); }
+
+    .legend-swatch {
+      width: 10px; height: 10px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .legend-name {
+      font-size: 11.5px;
+      color: var(--text);
+      flex: 1;
+    }
+
+    .legend-count {
+      font-size: 10px;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    /* ── Tooltip ─────────────────────────────────────────────── */
+    #tooltip {
+      position: fixed;
+      z-index: 600;
+      pointer-events: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 12px 14px;
+      width: 240px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      transition: opacity 0.1s;
+    }
+
+    #tooltip.hidden { opacity: 0; }
+
+    .tt-bureau {
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 3px;
+      font-weight: 600;
+    }
+
+    .tt-lieu {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 1px;
+      line-height: 1.3;
+    }
+
+    .tt-adresse {
+      font-size: 10px;
+      color: var(--muted);
+      font-style: italic;
+      margin-bottom: 10px;
+    }
+
+    .tt-winner {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 9px;
+      border-radius: 3px;
+      margin-bottom: 9px;
+    }
+
+    .tt-winner-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .tt-winner-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .tt-winner-pct {
+      margin-left: auto;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .tt-bars { display: flex; flex-direction: column; gap: 4px; }
+
+    .tt-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .tt-bar-name {
+      font-size: 10px;
+      color: var(--muted);
+      width: 70px;
+      flex-shrink: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tt-bar-track {
+      flex: 1;
+      height: 4px;
+      background: #e8e3da;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .tt-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+
+    .tt-bar-pct {
+      font-size: 9px;
+      color: var(--muted);
+      width: 30px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .tt-participation {
+      margin-top: 9px;
+      padding-top: 7px;
+      border-top: 1px solid var(--border);
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    /* ── Loading ─────────────────────────────────────────────── */
+    #loading {
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      transition: opacity 0.5s ease;
+    }
+
+    #loading.fade-out { opacity: 0; pointer-events: none; }
+
+    .loading-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    .loading-logo span { color: var(--accent); }
+
+    .loading-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .loading-dots span {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--muted);
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes pulse {
+      0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+      40% { opacity: 1; transform: scale(1); }
+    }
+
+    .loading-status {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* ── Detail panel ────────────────────────────────────────── */
+    #detail-panel {
+      position: fixed;
+      top: 61px; right: 0; bottom: 0;
+      width: 320px;
+      z-index: 400;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      overflow-y: auto;
+      transform: translateX(100%);
+      transition: transform 0.25s ease;
+    }
+
+    #detail-panel.open { transform: translateX(0); }
+
+    #map { transition: right 0.25s ease; }
+    body.panel-open #map { right: 320px; }
+
+    .dp-header {
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    .dp-bureau {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .dp-lieu {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.25;
+      margin-bottom: 2px;
+      padding-right: 28px;
+    }
+
+    .dp-adresse {
+      font-size: 11px;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .dp-close {
+      position: absolute;
+      top: 14px; right: 12px;
+      width: 24px; height: 24px;
+      display: flex; align-items: center; justify-content: center;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1;
+      border-radius: 3px;
+      padding: 0;
+    }
+    .dp-close:hover { background: var(--bg); color: var(--text); }
+
+    .dp-stats {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dp-stat {
+      flex: 1;
+      padding: 10px 14px;
+      border-right: 1px solid var(--border);
+    }
+    .dp-stat:last-child { border-right: none; }
+
+    .dp-stat-val {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text);
+      display: block;
+      line-height: 1.1;
+    }
+
+    .dp-stat-lbl {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+
+    .dp-table-wrap { padding: 0; }
+
+    .dp-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+
+    .dp-table thead tr {
+      border-bottom: 2px solid var(--border);
+    }
+
+    .dp-table th {
+      padding: 8px 10px;
+      text-align: left;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .dp-table th.num { text-align: center; width: 28px; }
+    .dp-table th.right { text-align: right; }
+
+    .dp-table td {
+      padding: 7px 10px;
+      vertical-align: middle;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dp-table tr:last-child td { border-bottom: none; }
+
+    .dp-table tr.winner td { background: #f7f4ef; }
+
+    .dp-table td.rank {
+      text-align: center;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .dp-table td.candidate {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .dp-swatch {
+      width: 8px; height: 8px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .dp-cand-name { font-weight: 600; color: var(--text); }
+    .dp-cand-party {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+
+    .dp-table td.votes {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      color: var(--text);
+    }
+
+    .dp-table td.pct-cell {
+      text-align: right;
+      min-width: 80px;
+    }
+
+    .dp-pct-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: flex-end;
+    }
+
+    .dp-pct-bar {
+      width: 48px;
+      height: 4px;
+      background: #e8e3da;
+      border-radius: 2px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .dp-pct-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+    }
+
+    .dp-pct-num {
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+      color: var(--text);
+      width: 36px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* ── Error ───────────────────────────────────────────────── */
+    #error {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      z-index: 800;
+      background: #fff5f5;
+      border: 1px solid #e8aaaa;
+      border-radius: 4px;
+      padding: 12px 16px;
+      font-size: 12px;
+      color: #8b2020;
+      max-width: 320px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Loading screen -->
+<div id="loading">
+  <div class="loading-logo">Toulouse <span>2026</span></div>
+  <div class="loading-dots"><span></span><span></span><span></span></div>
+  <div class="loading-status" id="loading-status">Chargement des données…</div>
+</div>
+
+<!-- Map -->
+<div id="map"></div>
+
+<!-- Header -->
+<div id="header">
+  <div class="header-inner">
+    <div class="title-block">
+      <div class="eyebrow">Élections municipales · 15 mars 2026 · 1<sup>er</sup> tour</div>
+      <h1>Toulouse par bureau <span>de vote</span></h1>
+      <div class="subtitle">Couleur = liste arrivée en tête dans chaque bureau</div>
+    </div>
+    <div id="global-stats"></div>
+  </div>
+</div>
+
+<!-- Legend -->
+<div id="legend">
+  <div class="legend-title">Listes en tête</div>
+  <div id="legend-items"></div>
+</div>
+
+<!-- Tooltip -->
+<div id="tooltip" class="hidden"></div>
+
+<!-- Detail panel -->
+<div id="detail-panel"></div>
+
+<!-- Error -->
+<div id="error"></div>
+
+<script>
+'use strict';
+
+// ── Configuration des listes ───────────────────────────────────────────────
+// voteIdx = index dans le tableau r.votes (0-based, correspond aux listes 01-10)
+
+const LISTS = [
+  { idx: 0, candidate: 'F. Briançon',    party: 'PS',  color: '#F06292' },
+  { idx: 1, candidate: 'G. Scalli',      party: '',    color: '#78909C' },
+  { idx: 2, candidate: 'M. Adrada',      party: '',    color: '#BA68C8' },
+  { idx: 3, candidate: 'J. Menéndez',    party: '',    color: '#FFB300' },
+  { idx: 4, candidate: 'JL. Moudenc',    party: 'DVD', color: '#42A5F5' },
+  { idx: 5, candidate: 'J. Leonardelli', party: 'RN',  color: '#7986CB' },
+  { idx: 6, candidate: 'A. Cottrel',     party: '',    color: '#4DB6AC' },
+  { idx: 7, candidate: 'L. Meilhac',     party: '',    color: '#FF8A65' },
+  { idx: 8, candidate: 'F. Piquemal',    party: 'LFI', color: '#EF5350' },
+  { idx: 9, candidate: 'V. Pedinotti',   party: '',    color: '#26C6DA' },
+];
+
+// ── State ──────────────────────────────────────────────────────────────────
+
+let map, geojsonLayer;
+
+// ── Init map ───────────────────────────────────────────────────────────────
+
+map = L.map('map', {
+  zoomControl: true,
+  attributionControl: false,
+  zoomAnimation: true,
+  preferCanvas: true,
+}).setView([43.6047, 1.4442], 13);
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  maxZoom: 19,
+  subdomains: 'abcd',
+}).addTo(map);
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+function getVoices(r, list) { return r.votes[list.idx] || 0; }
+
+function getWinner(r) {
+  let best = null, bestVoices = -1;
+  for (const list of LISTS) {
+    const v = getVoices(r, list);
+    if (v > bestVoices) { bestVoices = v; best = list; }
+  }
+  return best;
+}
+
+function getTotal(r) { return r.votes.reduce((s, v) => s + v, 0); }
+
+function pct(v, total) {
+  if (!total) return 0;
+  return Math.round((v / total) * 1000) / 10;
+}
+
+function candidateLabel(list) {
+  return list.party ? `${list.candidate} (${list.party})` : list.candidate;
+}
+
+// ── Load data ──────────────────────────────────────────────────────────────
+
+function setStatus(msg) {
+  document.getElementById('loading-status').textContent = msg;
+}
+
+async function loadData() {
+  setStatus('Chargement des données…');
+  const resp = await fetch('data.json');
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  setStatus('Traitement…');
+  return resp.json();
+}
+
+// ── Detail panel ───────────────────────────────────────────────────────────
+
+const detailPanel = document.getElementById('detail-panel');
+let selectedLayer = null;
+
+function openPanel(feature) {
+  const props = feature.properties;
+  const r = props.r;
+  const total = getTotal(r);
+  const winner = getWinner(r);
+  const participation = r.i ? pct(r.v, r.i) : 0;
+
+  const sorted = LISTS.map(l => ({ ...l, v: getVoices(r, l) }))
+    .filter(l => l.v > 0)
+    .sort((a, b) => b.v - a.v);
+
+  const rows = sorted.map((l, i) => `
+    <tr class="${l.idx === winner.idx ? 'winner' : ''}">
+      <td class="rank">${i + 1}</td>
+      <td class="candidate">
+        <div class="dp-swatch" style="background:${l.color}"></div>
+        <div>
+          <div class="dp-cand-name">${l.candidate}</div>
+          ${l.party ? `<div class="dp-cand-party">${l.party}</div>` : ''}
+        </div>
+      </td>
+      <td class="votes">${l.v.toLocaleString('fr')}</td>
+      <td class="pct-cell">
+        <div class="dp-pct-row">
+          <div class="dp-pct-bar">
+            <div class="dp-pct-bar-fill" style="width:${pct(l.v, total)}%;background:${l.color}"></div>
+          </div>
+          <div class="dp-pct-num">${pct(l.v, total)} %</div>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+
+  detailPanel.innerHTML = `
+    <div class="dp-header">
+      <div class="dp-bureau">Bureau n°${props.b}</div>
+      <div class="dp-lieu">${props.n || '—'}</div>
+      <div class="dp-adresse">${props.a || ''}</div>
+      <button class="dp-close" id="dp-close-btn" title="Fermer">×</button>
+    </div>
+    <div class="dp-stats">
+      <div class="dp-stat">
+        <span class="dp-stat-val">${participation} %</span>
+        <div class="dp-stat-lbl">Participation</div>
+      </div>
+      <div class="dp-stat">
+        <span class="dp-stat-val">${r.v.toLocaleString('fr')}</span>
+        <div class="dp-stat-lbl">Votants</div>
+      </div>
+      <div class="dp-stat">
+        <span class="dp-stat-val">${r.i.toLocaleString('fr')}</span>
+        <div class="dp-stat-lbl">Inscrits</div>
+      </div>
+    </div>
+    <div class="dp-table-wrap">
+      <table class="dp-table">
+        <thead>
+          <tr>
+            <th class="num">#</th>
+            <th>Liste</th>
+            <th class="right">Voix</th>
+            <th class="right">%</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `;
+
+  document.getElementById('dp-close-btn').addEventListener('click', closePanel);
+
+  detailPanel.classList.add('open');
+  document.body.classList.add('panel-open');
+  setTimeout(() => map.invalidateSize(), 260);
+}
+
+function closePanel() {
+  detailPanel.classList.remove('open');
+  document.body.classList.remove('panel-open');
+  if (selectedLayer) {
+    geojsonLayer.resetStyle(selectedLayer);
+    selectedLayer = null;
+  }
+  setTimeout(() => map.invalidateSize(), 260);
+}
+
+// ── Render map ─────────────────────────────────────────────────────────────
+
+const tooltip = document.getElementById('tooltip');
+
+function showTooltip(e, feature) {
+  const props = feature.properties;
+  const r = props.r;
+  const total = getTotal(r);
+  const winner = getWinner(r);
+  const participation = r.i ? pct(r.v, r.i) : 0;
+
+  // Sort lists by votes desc
+  const sorted = LISTS.map(l => ({ ...l, v: getVoices(r, l) }))
+    .filter(l => l.v > 0)
+    .sort((a, b) => b.v - a.v);
+
+  const barsHtml = sorted.map(l => `
+    <div class="tt-bar-row">
+      <div class="tt-bar-name" title="${candidateLabel(l)}">${l.candidate}</div>
+      <div class="tt-bar-track">
+        <div class="tt-bar-fill" style="width:${pct(l.v, total)}%;background:${l.color}"></div>
+      </div>
+      <div class="tt-bar-pct">${pct(l.v, total)}%</div>
+    </div>
+  `).join('');
+
+  tooltip.innerHTML = `
+    <div class="tt-bureau">Bureau n°${props.b}</div>
+    <div class="tt-lieu">${props.n || '—'}</div>
+    <div class="tt-adresse">${props.a || ''}</div>
+    <div class="tt-winner" style="background:${winner.color}18;border-left:3px solid ${winner.color}">
+      <div class="tt-winner-name">${candidateLabel(winner)}</div>
+      <div class="tt-winner-pct">${pct(getVoices(r, winner), total)}%</div>
+    </div>
+    <div class="tt-bars">${barsHtml}</div>
+    <div class="tt-participation">
+      Participation : ${participation}% · ${r.v.toLocaleString('fr')} / ${r.i.toLocaleString('fr')} inscrits
+    </div>
+  `;
+
+  tooltip.classList.remove('hidden');
+  moveTooltip(e);
+}
+
+function moveTooltip(e) {
+  const x = e.originalEvent.clientX;
+  const y = e.originalEvent.clientY;
+  const W = window.innerWidth, H = window.innerHeight;
+  const tw = 240 + 32, th = 280;
+  const left = x + 16 + tw > W ? x - tw : x + 16;
+  const top  = y + 16 + th > H ? y - th : y + 16;
+  tooltip.style.left = left + 'px';
+  tooltip.style.top  = top  + 'px';
+}
+
+function hideTooltip() {
+  tooltip.classList.add('hidden');
+}
+
+function renderGeoJSON(geojson) {
+  // Count bureaus won per list
+  const winCount = {};
+  LISTS.forEach(l => { winCount[l.num] = 0; });
+
+  let totalInscrits = 0, totalVotants = 0, totalExprimés = 0;
+
+  // Annotate features
+  geojson.features.forEach(f => {
+    const r = f.properties.r || null;
+    if (r) {
+      const winner = getWinner(r);
+      f._winner = winner;
+      winCount[winner.idx] = (winCount[winner.idx] || 0) + 1;
+      totalInscrits += r.i;
+      totalVotants  += r.v;
+      totalExprimés += r.e;
+    }
+  });
+
+  geojsonLayer = L.geoJSON(geojson, {
+    style: feature => {
+      const winner = feature._winner;
+      const color  = winner ? winner.color : '#ccc';
+      return {
+        fillColor:   color,
+        fillOpacity: 0.55,
+        color:       'rgba(0,0,0,0.5)',
+        weight:      0.8,
+        opacity:     1,
+      };
+    },
+    onEachFeature: (feature, layer) => {
+      layer.on({
+        mouseover(e) {
+          layer.setStyle({ fillOpacity: 0.85, weight: 1.5, color: '#1a1714' });
+          layer.bringToFront();
+          if (feature.properties.r) showTooltip(e, feature);
+        },
+        mousemove(e) {
+          if (feature.properties.r) moveTooltip(e);
+        },
+        mouseout() {
+          if (layer !== selectedLayer) geojsonLayer.resetStyle(layer);
+          hideTooltip();
+        },
+        click() {
+          if (!feature.properties.r) return;
+          // Deselect previous
+          if (selectedLayer && selectedLayer !== layer) geojsonLayer.resetStyle(selectedLayer);
+          selectedLayer = layer;
+          layer.setStyle({ fillOpacity: 0.85, weight: 2, color: '#1a1714' });
+          layer.bringToFront();
+          openPanel(feature);
+        },
+      });
+    },
+  }).addTo(map);
+
+  // Fit bounds
+  map.fitBounds(geojsonLayer.getBounds(), { padding: [80, 80] });
+
+  // Render legend (only lists with at least 1 bureau won)
+  const legendItems = document.getElementById('legend-items');
+  const activeWinners = LISTS
+    .map(l => ({ ...l, count: winCount[l.idx] || 0 }))
+    .filter(l => l.count > 0)
+    .sort((a, b) => b.count - a.count);
+
+  legendItems.innerHTML = activeWinners.map(l => `
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:${l.color}"></div>
+      <div class="legend-name">${candidateLabel(l)}</div>
+      <div class="legend-count">${l.count} BV</div>
+    </div>
+  `).join('');
+
+  // Global stats
+  const participation = totalInscrits ? pct(totalVotants, totalInscrits) : 0;
+  const totalBV = geojson.features.length;
+
+  document.getElementById('global-stats').innerHTML = `
+    <div class="stat-pill">
+      <span class="val">${participation}%</span>
+      <span class="lbl">Participation</span>
+    </div>
+    <div class="stat-pill">
+      <span class="val">${totalBV}</span>
+      <span class="lbl">Bureaux de vote</span>
+    </div>
+    <div class="stat-pill">
+      <span class="val">${totalVotants.toLocaleString('fr')}</span>
+      <span class="lbl">Votants</span>
+    </div>
+  `;
+}
+
+// ── Bootstrap ──────────────────────────────────────────────────────────────
+
+(async () => {
+  try {
+    const geojson = await loadData();
+    renderGeoJSON(geojson);
+
+    // Fade out loading screen
+    const loading = document.getElementById('loading');
+    loading.classList.add('fade-out');
+    setTimeout(() => loading.remove(), 600);
+  } catch (err) {
+    console.error(err);
+    document.getElementById('loading').remove();
+    const errEl = document.getElementById('error');
+    errEl.style.display = 'block';
+    errEl.textContent = `Erreur de chargement : ${err.message}`;
+  }
+})();
+</script>
+</body>
+</html>
