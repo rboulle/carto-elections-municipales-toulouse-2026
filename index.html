@@ -565,7 +565,6 @@
       border: 1px solid var(--border);
       border-radius: 4px;
       padding: 10px 12px;
-      min-width: 280px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
       transition: right 0.25s ease;
     }
@@ -581,100 +580,68 @@
       font-weight: 600;
     }
 
-    .vs-row {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 4px;
+    #vs-table {
+      border-collapse: collapse;
+      width: 100%;
     }
-    .vs-row:last-child { margin-bottom: 0; }
+
+    #vs-table thead th {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      font-weight: 600;
+      padding: 0 4px 5px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    #vs-table thead th:last-child,
+    #vs-table thead th:nth-child(4) { text-align: right; }
+
+    #vs-table tbody tr { vertical-align: middle; }
+
+    #vs-table tbody td {
+      padding: 3px 4px;
+      font-size: 11px;
+      white-space: nowrap;
+    }
 
     .vs-swatch {
       width: 8px; height: 8px;
       border-radius: 2px;
+      display: inline-block;
       flex-shrink: 0;
     }
 
     .vs-name {
-      font-size: 11px;
-      color: var(--text);
-      width: 82px;
-      flex-shrink: 0;
-      white-space: nowrap;
+      max-width: 110px;
       overflow: hidden;
       text-overflow: ellipsis;
+      color: var(--text);
     }
 
     .vs-bar-track {
-      flex: 1;
+      width: 60px;
       height: 3px;
       background: #e8e3da;
       border-radius: 2px;
       overflow: hidden;
+      display: block;
     }
 
     .vs-bar-fill { height: 100%; border-radius: 2px; }
 
-    .vs-header {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 6px;
-      padding-bottom: 5px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .vs-header-spacer {
-      width: 8px;
-      flex-shrink: 0;
-    }
-
-    .vs-header-name {
-      font-size: 9px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--muted);
-      width: 82px;
-      flex-shrink: 0;
-    }
-
-    .vs-header-bar { flex: 1; }
-
-    .vs-header-pct {
-      font-size: 9px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--muted);
-      width: 42px;
-      text-align: right;
-      flex-shrink: 0;
-    }
-
-    .vs-header-votes {
-      font-size: 9px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--muted);
-      width: 58px;
-      text-align: right;
-      flex-shrink: 0;
-    }
-
     .vs-pct {
-      font-size: 10px;
-      color: var(--muted);
-      width: 42px;
       text-align: right;
-      flex-shrink: 0;
+      color: var(--muted);
       font-variant-numeric: tabular-nums;
     }
 
     .vs-votes {
-      font-size: 10px;
-      color: var(--muted);
-      width: 58px;
       text-align: right;
-      flex-shrink: 0;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
       font-variant-numeric: tabular-nums;
     }
 
@@ -1037,7 +1004,17 @@
 <!-- Votes summary -->
 <div id="votes-summary">
   <div class="vs-title">Voix par liste</div>
-  <div id="vs-rows"></div>
+  <table id="vs-table">
+    <thead>
+      <tr>
+        <th colspan="2">Liste</th>
+        <th></th>
+        <th>Score</th>
+        <th>Nb de voix</th>
+      </tr>
+    </thead>
+    <tbody id="vs-rows"></tbody>
+  </table>
 </div>
 
 <!-- Tooltip -->
@@ -1551,24 +1528,17 @@ function renderGeoJSON(geojson) {
     .sort((a, b) => b.totalVoices - a.totalVoices);
   const maxVoices = sortedByVotes[0]?.totalVoices || 1;
 
-  document.getElementById('vs-rows').innerHTML = `
-    <div class="vs-header">
-      <div class="vs-header-spacer"></div>
-      <div class="vs-header-name">Liste</div>
-      <div class="vs-header-bar"></div>
-      <div class="vs-header-pct">Score</div>
-      <div class="vs-header-votes">Nb de voix</div>
-    </div>` + sortedByVotes.map(l => {
+  document.getElementById('vs-rows').innerHTML = sortedByVotes.map(l => {
     const barWidth = Math.round(l.totalVoices / maxVoices * 100);
     const pctVal   = totalExprimés ? pct(l.totalVoices, totalExprimés) : 0;
     return `
-      <div class="vs-row">
-        <div class="vs-swatch" style="background:${l.color}"></div>
-        <div class="vs-name">${candidateLabel(l)}</div>
-        <div class="vs-bar-track"><div class="vs-bar-fill" style="width:${barWidth}%;background:${l.color}"></div></div>
-        <div class="vs-pct">${pctVal}%</div>
-        <div class="vs-votes">${l.totalVoices.toLocaleString('fr')}</div>
-      </div>`;
+      <tr>
+        <td><span class="vs-swatch" style="background:${l.color}"></span></td>
+        <td class="vs-name">${candidateLabel(l)}</td>
+        <td><span class="vs-bar-track"><span class="vs-bar-fill" style="width:${barWidth}%;background:${l.color}"></span></span></td>
+        <td class="vs-pct">${pctVal}%</td>
+        <td class="vs-votes">${l.totalVoices.toLocaleString('fr')}</td>
+      </tr>`;
   }).join('');
 
   // Simulator
