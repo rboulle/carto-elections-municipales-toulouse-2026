@@ -85,6 +85,52 @@
 
     .header-sub-sep { opacity: 0.4; }
 
+    /* View toggle */
+    .view-toggle {
+      display: flex;
+      gap: 2px;
+      margin-top: 6px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px;
+      width: fit-content;
+    }
+
+    .vt-btn {
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: none;
+      border: none;
+      border-radius: 3px;
+      padding: 4px 10px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+
+    .vt-btn:hover { color: var(--text); }
+    .vt-btn.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+    /* Participation gradient legend */
+    .legend-gradient {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      margin-bottom: 4px;
+    }
+
+    .legend-gradient-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--muted);
+    }
+
     /* Global stats */
     #global-stats {
       display: flex;
@@ -998,6 +1044,23 @@
       /* Tableau des voix : masqué (trop d'espace pris sur la carte) */
       #votes-summary { display: none; }
 
+      /* Toggle de vue : compact, intégré dans la ligne du titre */
+      .title-block {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 0 10px;
+      }
+      .title-block .eyebrow { flex: 0 0 100%; }
+      .title-block h1 { flex: 1 1 auto; }
+      .view-toggle {
+        margin-top: 0;
+        flex: 0 0 auto;
+        align-self: center;
+      }
+      .vt-btn { padding: 3px 8px; }
+
       /* Légende : compacte */
       #legend { padding: 8px 10px; min-width: 0; }
       .legend-count { display: none; }
@@ -1082,9 +1145,13 @@
       <div class="eyebrow">Élections municipales · 15 mars 2026 · 1<sup>er</sup> tour</div>
       <h1>Toulouse par bureau <span>de vote</span></h1>
       <div class="header-sub">
-        <span>Couleur = liste arrivée en tête dans chaque bureau</span>
+        <span id="header-sub-mode">Couleur = liste arrivée en tête dans chaque bureau</span>
         <span class="header-sub-sep">·</span>
         <span>Dataviz par <a href="https://www.linkedin.com/in/remi-boulle/" target="_blank" rel="noopener">Rémi Boulle</a> avec Claude Code · Source : <a href="https://www.data.gouv.fr" target="_blank" rel="noopener">data.gouv.fr</a></span>
+      </div>
+      <div class="view-toggle">
+        <button id="btn-results" class="vt-btn active" onclick="setViewMode('results')">Résultats</button>
+        <button id="btn-participation" class="vt-btn" onclick="setViewMode('participation')">Participation</button>
       </div>
     </div>
     <div id="global-stats"></div>
@@ -1203,6 +1270,8 @@ const LISTS = [
 // ── State ──────────────────────────────────────────────────────────────────
 
 let map, geojsonLayer;
+let viewMode = 'results';
+let _activeWinners = [];
 
 // ── Init map ───────────────────────────────────────────────────────────────
 
@@ -1252,6 +1321,75 @@ function getZoneColor(winner, r) {
   if (winner.idx === 4) return lerpColor('#BBDEFB', '#1565C0', t); // Moudenc : bleu clair → bleu foncé
   if (winner.idx === 8) return lerpColor('#FFCDD2', '#B71C1C', t); // Piquemal : rouge clair → rouge foncé
   return winner.color;
+}
+
+const PART_MIN = 0.30, PART_MAX = 0.65;
+const PART_COLOR_LOW = '#FFFDE7', PART_COLOR_HIGH = '#E65100';
+
+function getParticipationColor(r) {
+  if (!r || !r.i) return '#ccc';
+  const rate = r.v / r.i;
+  const t = Math.max(0, Math.min(1, (rate - PART_MIN) / (PART_MAX - PART_MIN)));
+  return lerpColor(PART_COLOR_LOW, PART_COLOR_HIGH, t);
+}
+
+function getFeatureColor(feature) {
+  const r = feature.properties.r;
+  if (viewMode === 'participation') return getParticipationColor(r);
+  const winner = feature._winner;
+  return winner ? getZoneColor(winner, r) : '#ccc';
+}
+
+function updateLegend(mode) {
+  const legendItems = document.getElementById('legend-items');
+  const legendTitle = document.querySelector('.legend-title');
+  if (mode === 'participation') {
+    legendTitle.textContent = 'Taux de participation';
+    const steps = 5;
+    const stops = Array.from({ length: steps }, (_, i) => {
+      const t = i / (steps - 1);
+      return lerpColor(PART_COLOR_LOW, PART_COLOR_HIGH, t);
+    });
+    legendItems.innerHTML = `
+      <div class="legend-gradient" style="background: linear-gradient(to right, ${stops.join(',')})"></div>
+      <div class="legend-gradient-labels">
+        <span>≤ ${Math.round(PART_MIN * 100)}%</span>
+        <span>≥ ${Math.round(PART_MAX * 100)}%</span>
+      </div>`;
+  } else {
+    legendTitle.textContent = 'Listes en tête';
+    legendItems.innerHTML = _activeWinners.map(l => `
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:${l.color}"></div>
+        <div class="legend-name">${candidateLabel(l)}</div>
+        <div class="legend-count">${l.count} BV</div>
+      </div>
+    `).join('');
+  }
+}
+
+function setViewMode(mode) {
+  viewMode = mode;
+  document.getElementById('btn-results').classList.toggle('active', mode === 'results');
+  document.getElementById('btn-participation').classList.toggle('active', mode === 'participation');
+  document.getElementById('header-sub-mode').textContent = mode === 'results'
+    ? 'Couleur = liste arrivée en tête dans chaque bureau'
+    : 'Couleur = taux de participation par bureau de vote';
+  document.getElementById('votes-summary').style.display = mode === 'participation' ? 'none' : '';
+  if (geojsonLayer) {
+    const opacity = mode === 'participation' ? 0.75 : 0.55;
+    geojsonLayer.setStyle(feature => ({
+      fillColor: getFeatureColor(feature),
+      fillOpacity: opacity,
+      color: 'rgba(0,0,0,0.5)',
+      weight: 0.8,
+      opacity: 1,
+    }));
+    if (selectedLayer) {
+      selectedLayer.setStyle({ fillOpacity: 0.85, weight: 2, color: '#1a1714' });
+    }
+  }
+  updateLegend(mode);
 }
 
 function pct(v, total) {
@@ -1573,17 +1711,13 @@ function renderGeoJSON(geojson) {
   });
 
   geojsonLayer = L.geoJSON(geojson, {
-    style: feature => {
-      const winner = feature._winner;
-      const color  = winner ? getZoneColor(winner, feature.properties.r) : '#ccc';
-      return {
-        fillColor:   color,
-        fillOpacity: 0.55,
-        color:       'rgba(0,0,0,0.5)',
-        weight:      0.8,
-        opacity:     1,
-      };
-    },
+    style: feature => ({
+      fillColor:   getFeatureColor(feature),
+      fillOpacity: 0.55,
+      color:       'rgba(0,0,0,0.5)',
+      weight:      0.8,
+      opacity:     1,
+    }),
     onEachFeature: (feature, layer) => {
       layer.on({
         mouseover(e) {
@@ -1614,20 +1748,12 @@ function renderGeoJSON(geojson) {
   // Fit bounds
   map.fitBounds(geojsonLayer.getBounds(), { padding: [80, 80] });
 
-  // Render legend (only lists with at least 1 bureau won)
-  const legendItems = document.getElementById('legend-items');
-  const activeWinners = LISTS
+  // Build active winners list and render legend
+  _activeWinners = LISTS
     .map(l => ({ ...l, count: winCount[l.idx] || 0 }))
     .filter(l => l.count > 0)
     .sort((a, b) => b.count - a.count);
-
-  legendItems.innerHTML = activeWinners.map(l => `
-    <div class="legend-item">
-      <div class="legend-swatch" style="background:${l.color}"></div>
-      <div class="legend-name">${candidateLabel(l)}</div>
-      <div class="legend-count">${l.count} BV</div>
-    </div>
-  `).join('');
+  updateLegend(viewMode);
 
   // Votes summary panel
   const sortedByVotes = LISTS
