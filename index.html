@@ -955,6 +955,28 @@
       margin-top: 5px;
     }
 
+    .sim-photo-box {
+      margin-top: 12px;
+      text-align: center;
+    }
+
+    .sim-photo {
+      width: 100%;
+      max-height: 240px;
+      object-fit: cover;
+      object-position: top;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      display: block;
+    }
+
+    .sim-photo-caption {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 5px;
+      font-style: italic;
+    }
+
     /* ── Error ───────────────────────────────────────────────── */
     #error {
       position: fixed;
@@ -1062,6 +1084,10 @@
         <div class="sim-result-box">
           <div class="sim-result-label">Projection 2nd tour</div>
           <div id="sim-result"></div>
+        </div>
+        <div id="sim-photo-box" class="sim-photo-box">
+          <img id="sim-photo" src="" alt="" class="sim-photo">
+          <div class="sim-photo-caption">Source : Wikipédia</div>
         </div>
       </div>
     </div>
@@ -1391,6 +1417,12 @@ function initSimulator(voicesByList, totalExprimés) {
       <div class="sim-winner-tag">En tête : ${winner}</div>
       <div class="sim-ecart">Écart : ${Math.abs(pb - moudenc).toLocaleString('fr')} voix</div>
     `;
+
+    const photo = document.getElementById('sim-photo');
+    photo.src  = mWins
+      ? 'images/Jean-Luc_Moudenc,_maire_(LR)_de_Toulouse_(cropped).jpg'
+      : 'images/François_Piquemal.jpg';
+    photo.alt  = mWins ? 'Jean-Luc Moudenc' : 'François Piquemal';
   }
 
   // Render slider rows (toutes les listes)
