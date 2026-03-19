@@ -718,6 +718,34 @@
 
     .sim-head { margin-bottom: 28px; }
 
+    .sim-head-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .sim-toggle {
+      flex-shrink: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 0.15s;
+      margin-top: 4px;
+    }
+    .sim-toggle:hover { color: var(--accent); }
+
+    #sim.collapsed .sim-sub,
+    #sim.collapsed .sim-layout { display: none; }
+    #sim.collapsed { padding-bottom: 24px; }
+
     .sim-title {
       font-family: 'Playfair Display', serif;
       font-size: clamp(20px, 2.5vw, 28px);
@@ -1029,8 +1057,13 @@
 <section id="sim">
   <div class="sim-inner">
     <div class="sim-head">
-      <div class="eyebrow">Second tour · Simulation</div>
-      <h2 class="sim-title">Report des voix</h2>
+      <div class="sim-head-top">
+        <div>
+          <div class="eyebrow">Second tour · Simulation</div>
+          <h2 class="sim-title">Report des voix</h2>
+        </div>
+        <button id="sim-toggle" class="sim-toggle" onclick="toggleSim()" title="Réduire">↑ Réduire</button>
+      </div>
       <p class="sim-sub">
         Piquemal (LFI) et Briançon (PS) fusionnent en une liste commune.
         Ajustez le report estimé de chaque liste éliminée vers l'un des deux finalistes.
@@ -1310,6 +1343,14 @@ function hideTooltip() {
 }
 
 // ── Simulator ──────────────────────────────────────────────────────────────
+
+function toggleSim() {
+  const sim = document.getElementById('sim');
+  const btn = document.getElementById('sim-toggle');
+  const collapsed = sim.classList.toggle('collapsed');
+  btn.textContent = collapsed ? '↓ Développer' : '↑ Réduire';
+  if (collapsed) window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
 function initSimulator(voicesByList, totalExprimés) {
   const PB_COLOR   = '#C62828';
