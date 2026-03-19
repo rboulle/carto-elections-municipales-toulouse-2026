@@ -543,6 +543,84 @@
       flex-shrink: 0;
     }
 
+    /* ── Votes summary ───────────────────────────────────────── */
+    #votes-summary {
+      position: fixed;
+      top: 70px;
+      right: 14px;
+      z-index: 500;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 10px 12px;
+      min-width: 230px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: right 0.25s ease;
+    }
+
+    body.panel-open #votes-summary { right: 334px; }
+
+    .vs-title {
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .vs-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+    .vs-row:last-child { margin-bottom: 0; }
+
+    .vs-swatch {
+      width: 8px; height: 8px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .vs-name {
+      font-size: 11px;
+      color: var(--text);
+      width: 82px;
+      flex-shrink: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .vs-bar-track {
+      flex: 1;
+      height: 3px;
+      background: #e8e3da;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .vs-bar-fill { height: 100%; border-radius: 2px; }
+
+    .vs-pct {
+      font-size: 10px;
+      color: var(--muted);
+      width: 34px;
+      text-align: right;
+      flex-shrink: 0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .vs-votes {
+      font-size: 10px;
+      color: var(--muted);
+      width: 44px;
+      text-align: right;
+      flex-shrink: 0;
+      font-variant-numeric: tabular-nums;
+    }
+
     /* ── Error ───────────────────────────────────────────────── */
     #error {
       position: fixed;
@@ -588,6 +666,12 @@
 <div id="legend">
   <div class="legend-title">Listes en tête</div>
   <div id="legend-items"></div>
+</div>
+
+<!-- Votes summary -->
+<div id="votes-summary">
+  <div class="vs-title">Voix par liste</div>
+  <div id="vs-rows"></div>
 </div>
 
 <!-- Tooltip -->
@@ -851,6 +935,8 @@ function renderGeoJSON(geojson) {
   LISTS.forEach(l => { winCount[l.num] = 0; });
 
   let totalInscrits = 0, totalVotants = 0, totalExprimés = 0;
+  const totalVoicesByList = {};
+  LISTS.forEach(l => { totalVoicesByList[l.idx] = 0; });
 
   // Annotate features
   geojson.features.forEach(f => {
@@ -862,6 +948,7 @@ function renderGeoJSON(geojson) {
       totalInscrits += r.i;
       totalVotants  += r.v;
       totalExprimés += r.e;
+      r.votes.forEach((v, i) => { totalVoicesByList[i] = (totalVoicesByList[i] || 0) + v; });
     }
   });
 
@@ -921,6 +1008,25 @@ function renderGeoJSON(geojson) {
       <div class="legend-count">${l.count} BV</div>
     </div>
   `).join('');
+
+  // Votes summary panel
+  const sortedByVotes = LISTS
+    .map(l => ({ ...l, totalVoices: totalVoicesByList[l.idx] || 0 }))
+    .sort((a, b) => b.totalVoices - a.totalVoices);
+  const maxVoices = sortedByVotes[0]?.totalVoices || 1;
+
+  document.getElementById('vs-rows').innerHTML = sortedByVotes.map(l => {
+    const barWidth = Math.round(l.totalVoices / maxVoices * 100);
+    const pctVal   = totalExprimés ? pct(l.totalVoices, totalExprimés) : 0;
+    return `
+      <div class="vs-row">
+        <div class="vs-swatch" style="background:${l.color}"></div>
+        <div class="vs-name">${candidateLabel(l)}</div>
+        <div class="vs-bar-track"><div class="vs-bar-fill" style="width:${barWidth}%;background:${l.color}"></div></div>
+        <div class="vs-pct">${pctVal}%</div>
+        <div class="vs-votes">${l.totalVoices.toLocaleString('fr')}</div>
+      </div>`;
+  }).join('');
 
   // Global stats
   const participation = totalInscrits ? pct(totalVotants, totalInscrits) : 0;
