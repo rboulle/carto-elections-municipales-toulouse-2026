@@ -943,6 +943,13 @@
       margin-top: 4px;
     }
 
+    .sim-ecart {
+      font-size: 11px;
+      text-align: center;
+      color: var(--muted);
+      margin-top: 5px;
+    }
+
     /* ── Error ───────────────────────────────────────────────── */
     #error {
       position: fixed;
@@ -979,7 +986,7 @@
       <div class="eyebrow">Élections municipales · 15 mars 2026 · 1<sup>er</sup> tour</div>
       <h1>Toulouse par bureau <span>de vote</span></h1>
       <div class="subtitle">Couleur = liste arrivée en tête dans chaque bureau</div>
-      <div class="credit">par <a href="https://github.com/rboulle/carto-elections-municipales-toulouse-2026" target="_blank" rel="noopener">rboulle</a></div>
+      <div class="credit">Dataviz réalisée par <a href="https://www.linkedin.com/in/remi-boulle/" target="_blank" rel="noopener">Rémi Boulle</a> avec Claude Code · Source des données : <a href="https://www.data.gouv.fr" target="_blank" rel="noopener">data.gouv.fr</a></div>
     </div>
     <div id="global-stats"></div>
   </div>
@@ -1368,6 +1375,7 @@ function initSimulator(voicesByList, totalExprimés) {
         <div class="sim-finalist-votes">${pb.toLocaleString('fr')} voix</div>
       </div>
       <div class="sim-winner-tag">En tête : ${winner}</div>
+      <div class="sim-ecart">Écart : ${Math.abs(pb - moudenc).toLocaleString('fr')} voix</div>
     `;
   }
 
