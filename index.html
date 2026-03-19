@@ -954,6 +954,76 @@
       font-style: italic;
     }
 
+    /* ── Mobile (≤ 640 px) ───────────────────────────────────── */
+    @media (max-width: 640px) {
+      /* Header : titre + stats empilés */
+      .header-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+      }
+      h1 { font-size: clamp(15px, 4.5vw, 20px); }
+      .header-sub { display: none; }
+      #global-stats {
+        flex-direction: row;
+        gap: 16px;
+        width: 100%;
+      }
+      .stat-pill { text-align: left; }
+      .stat-pill .val { font-size: 15px; }
+      .stat-pill .lbl { font-size: 9px; }
+
+      /* Tableau des voix : masqué (trop d'espace pris sur la carte) */
+      #votes-summary { display: none; }
+
+      /* Légende : compacte */
+      #legend { padding: 8px 10px; min-width: 0; }
+      .legend-count { display: none; }
+
+      /* Tooltip : masqué sur touch (pas de hover) */
+      #tooltip { display: none !important; }
+
+      /* Bouton simulateur : évite le chevauchement avec la légende */
+      #scroll-hint {
+        left: auto;
+        right: 14px;
+        transform: none;
+      }
+
+      /* Detail panel : drawer du bas pleine largeur */
+      #detail-panel {
+        top: auto;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 65vh;
+        border-left: none;
+        border-top: 2px solid var(--border);
+        border-radius: 12px 12px 0 0;
+        transform: translateY(100%);
+      }
+      #detail-panel.open { transform: translateY(0); }
+      /* Le panel se superpose à la carte (pas de rétrécissement) */
+      body.panel-open #map { right: 0; }
+
+      /* Simulateur : slider pleine largeur, pct en ligne */
+      #sim { padding: 28px 14px 60px; }
+      .sim-rows-head { display: none; }
+      .sim-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px 8px;
+        padding: 8px;
+      }
+      .sim-row-info { flex: 1 0 100%; }
+      .sim-pct-m    { flex: 0 0 36px; font-size: 10px; order: 2; }
+      input.sim-range { flex: 1; min-width: 0; order: 3; }
+      .sim-pct-pb   { flex: 0 0 36px; font-size: 10px; order: 4; }
+      .sim-result-box { position: static; }
+    }
+
     /* ── Error ───────────────────────────────────────────────── */
     #error {
       position: fixed;
