@@ -21,6 +21,7 @@
       --text:    #1a1714;
       --muted:   #776e63;
       --accent:  #b5470e;
+      --hh:      64px; /* hauteur header — mise à jour par JS */
     }
 
     html, body {
@@ -36,7 +37,7 @@
       z-index: 1000;
       background: var(--surface);
       border-bottom: 1px solid var(--border);
-      padding: 12px 20px;
+      padding: 8px 20px;
     }
 
     .header-inner {
@@ -64,25 +65,25 @@
       color: var(--text);
     }
 
-    .subtitle {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 3px;
-    }
-
-    .credit {
+    .header-sub {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 2px;
       font-size: 11px;
       color: var(--muted);
-      margin-top: 3px;
     }
 
-    .credit a {
+    .header-sub a {
       color: var(--muted);
       text-decoration: underline;
       text-underline-offset: 2px;
     }
 
-    .credit a:hover { color: var(--accent); }
+    .header-sub a:hover { color: var(--accent); }
+
+    .header-sub-sep { opacity: 0.4; }
 
     /* Global stats */
     #global-stats {
@@ -116,7 +117,7 @@
     #map {
       position: fixed;
       inset: 0;
-      top: 61px; /* below header */
+      top: var(--hh);
       z-index: 1;
     }
 
@@ -363,7 +364,7 @@
     /* ── Detail panel ────────────────────────────────────────── */
     #detail-panel {
       position: fixed;
-      top: 61px; right: 0; bottom: 0;
+      top: var(--hh); right: 0; bottom: 0;
       width: 320px;
       z-index: 400;
       background: var(--surface);
@@ -558,7 +559,7 @@
     /* ── Votes summary ───────────────────────────────────────── */
     #votes-summary {
       position: fixed;
-      top: 70px;
+      top: calc(var(--hh) + 8px);
       right: 14px;
       z-index: 500;
       background: var(--surface);
@@ -672,7 +673,7 @@
     #sim {
       position: relative;
       z-index: 200;
-      margin-top: calc(100vh - 61px);
+      margin-top: calc(100vh - var(--hh));
       background: var(--bg);
       border-top: 2px solid var(--border);
       padding: 40px 24px 80px;
@@ -988,8 +989,11 @@
     <div class="title-block">
       <div class="eyebrow">Élections municipales · 15 mars 2026 · 1<sup>er</sup> tour</div>
       <h1>Toulouse par bureau <span>de vote</span></h1>
-      <div class="subtitle">Couleur = liste arrivée en tête dans chaque bureau</div>
-      <div class="credit">Dataviz réalisée par <a href="https://www.linkedin.com/in/remi-boulle/" target="_blank" rel="noopener">Rémi Boulle</a> avec Claude Code · Source des données : <a href="https://www.data.gouv.fr" target="_blank" rel="noopener">data.gouv.fr</a></div>
+      <div class="header-sub">
+        <span>Couleur = liste arrivée en tête dans chaque bureau</span>
+        <span class="header-sub-sep">·</span>
+        <span>Dataviz par <a href="https://www.linkedin.com/in/remi-boulle/" target="_blank" rel="noopener">Rémi Boulle</a> avec Claude Code · Source : <a href="https://www.data.gouv.fr" target="_blank" rel="noopener">data.gouv.fr</a></span>
+      </div>
     </div>
     <div id="global-stats"></div>
   </div>
@@ -1076,6 +1080,14 @@
 
 <script>
 'use strict';
+
+// ── Layout : positionne les éléments sous le header réel ───────────────────
+function adjustToHeader() {
+  const h = document.getElementById('header').offsetHeight;
+  document.documentElement.style.setProperty('--hh', h + 'px');
+}
+adjustToHeader();
+window.addEventListener('resize', adjustToHeader);
 
 // ── Configuration des listes ───────────────────────────────────────────────
 // voteIdx = index dans le tableau r.votes (0-based, correspond aux listes 01-10)
