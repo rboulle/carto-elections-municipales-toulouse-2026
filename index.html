@@ -24,11 +24,9 @@
     }
 
     html, body {
-      height: 100%;
       background: var(--bg);
       color: var(--text);
       font-family: 'Source Sans 3', 'Helvetica Neue', Arial, sans-serif;
-      overflow: hidden;
     }
 
     /* ── Header ─────────────────────────────────────────────── */
@@ -666,6 +664,270 @@
       font-variant-numeric: tabular-nums;
     }
 
+    /* ── Scroll hint ─────────────────────────────────────────── */
+    #scroll-hint {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 500;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 7px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+      transition: opacity 0.3s, color 0.15s;
+      white-space: nowrap;
+      letter-spacing: 0.02em;
+    }
+    #scroll-hint:hover { color: var(--accent); }
+    #scroll-hint.hidden { opacity: 0; pointer-events: none; }
+
+    /* ── Simulator ────────────────────────────────────────────── */
+    #sim {
+      position: relative;
+      z-index: 200;
+      margin-top: calc(100vh - 61px);
+      background: var(--bg);
+      border-top: 2px solid var(--border);
+      padding: 40px 24px 80px;
+    }
+
+    .sim-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .sim-head { margin-bottom: 28px; }
+
+    .sim-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(20px, 2.5vw, 28px);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin: 4px 0 8px;
+    }
+
+    .sim-sub {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
+      max-width: 640px;
+    }
+
+    .sim-layout {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 28px;
+      align-items: start;
+    }
+
+    @media (max-width: 780px) {
+      .sim-layout { grid-template-columns: 1fr; }
+    }
+
+    /* Section label */
+    .sim-section-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    /* Fixed rows */
+    .sim-fixed { margin-bottom: 20px; }
+
+    .sim-fixed-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      margin-bottom: 5px;
+    }
+
+    .sim-swatch {
+      width: 10px; height: 10px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .sim-fixed-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      flex: 1;
+    }
+
+    .sim-fixed-1r {
+      font-size: 11px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      margin-right: 8px;
+    }
+
+    .sim-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: #e8f5e9;
+      color: #2e7d32;
+      flex-shrink: 0;
+    }
+
+    /* Slider rows */
+    .sim-rows-head {
+      display: grid;
+      grid-template-columns: 1fr 44px 120px 44px;
+      gap: 8px;
+      padding: 0 12px 6px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sim-rows-head span {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .sim-rows-head span:nth-child(2),
+    .sim-rows-head span:nth-child(4) { text-align: right; }
+    .sim-rows-head span:nth-child(3) { text-align: center; }
+
+    .sim-row {
+      display: grid;
+      grid-template-columns: 1fr 44px 120px 44px;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sim-row:last-child { border-bottom: none; }
+
+    .sim-row-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sim-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .sim-1r {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 1px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .sim-pct-m, .sim-pct-pb {
+      font-size: 11px;
+      font-variant-numeric: tabular-nums;
+      color: var(--text);
+      text-align: right;
+    }
+
+    .sim-pct-m { color: #1565C0; }
+    .sim-pct-pb { color: #C62828; }
+
+    input[type=range].sim-range {
+      width: 100%;
+      height: 4px;
+      cursor: pointer;
+      accent-color: var(--accent);
+    }
+
+    /* Result box */
+    .sim-result-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 16px;
+      position: sticky;
+      top: 78px;
+    }
+
+    .sim-result-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+
+    .sim-finalist {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .sim-finalist:last-of-type { border-bottom: none; }
+
+    .sim-finalist-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .sim-finalist-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      flex: 1;
+    }
+
+    .sim-finalist-pct {
+      font-size: 22px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--text);
+    }
+
+    .sim-finalist-votes {
+      font-size: 11px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .sim-finalist.winner .sim-finalist-name { color: var(--accent); }
+    .sim-finalist.winner .sim-finalist-pct  { color: var(--accent); }
+
+    .sim-split-bar {
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+      margin: 14px 0;
+    }
+
+    .sim-split-m  { background: #1565C0; transition: width 0.25s ease; }
+    .sim-split-pb { background: #C62828; flex: 1; transition: none; }
+
+    .sim-winner-tag {
+      font-size: 11px;
+      font-weight: 600;
+      text-align: center;
+      padding: 6px 10px;
+      border-radius: 3px;
+      background: rgba(181, 71, 14, 0.08);
+      color: var(--accent);
+      margin-top: 4px;
+    }
+
     /* ── Error ───────────────────────────────────────────────── */
     #error {
       position: fixed;
@@ -734,6 +996,49 @@
 
 <!-- Error -->
 <div id="error"></div>
+
+<!-- Scroll hint -->
+<div id="scroll-hint" class="hidden" onclick="document.getElementById('sim').scrollIntoView({behavior:'smooth'})">
+  Simulateur 2nd tour ↓
+</div>
+
+<!-- Simulator section -->
+<section id="sim">
+  <div class="sim-inner">
+    <div class="sim-head">
+      <div class="eyebrow">Second tour · Simulation</div>
+      <h2 class="sim-title">Report des voix</h2>
+      <p class="sim-sub">
+        Piquemal (LFI) et Briançon (PS) fusionnent en une liste commune.
+        Ajustez le report estimé de chaque liste éliminée vers l'un des deux finalistes.
+      </p>
+    </div>
+
+    <div class="sim-layout">
+      <!-- Left: sliders -->
+      <div>
+        <div>
+          <div class="sim-section-label">Report estimé vers Piquemal / Briançon — ajustez chaque liste</div>
+          <div class="sim-rows-head">
+            <span>Liste · 1er tour</span>
+            <span>→ M</span>
+            <span></span>
+            <span>→ P/B</span>
+          </div>
+          <div id="sim-slider-rows"></div>
+        </div>
+      </div>
+
+      <!-- Right: result -->
+      <div>
+        <div class="sim-result-box">
+          <div class="sim-result-label">Projection 2nd tour</div>
+          <div id="sim-result"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <script>
 'use strict';
@@ -981,6 +1286,117 @@ function hideTooltip() {
   tooltip.classList.add('hidden');
 }
 
+// ── Simulator ──────────────────────────────────────────────────────────────
+
+function initSimulator(voicesByList, totalExprimés) {
+  const PB_COLOR   = '#C62828';
+  const PB_NAME    = 'Piquemal / Briançon';
+  const MOUD_COLOR = '#1565C0';
+  const MOUD_NAME  = 'JL. Moudenc (DVD)';
+
+  // % of each list going to P/B (0–100), remainder → Moudenc
+  // Moudenc (4) : 10% → P/B (90% fidèles)
+  // Piquemal (8) + Briançon (0) : 90% → P/B (90% fidèles)
+  // Autres : 50% par défaut
+  const DEFAULTS = { 4: 10, 8: 90, 0: 90 };
+  const state = {};
+  LISTS.forEach(l => { state[l.idx] = DEFAULTS[l.idx] ?? 50; });
+
+  // Toutes les listes triées : Moudenc en premier, P/B ensuite, autres triés par voix
+  const pbIdxs = [0, 8];
+  const sorted = [
+    LISTS.find(l => l.idx === 4),
+    ...LISTS.filter(l => pbIdxs.includes(l.idx)),
+    ...LISTS.filter(l => l.idx !== 4 && !pbIdxs.includes(l.idx))
+      .sort((a, b) => (voicesByList[b.idx] || 0) - (voicesByList[a.idx] || 0)),
+  ];
+
+  function compute() {
+    let pb = 0, moudenc = 0;
+    LISTS.forEach(l => {
+      const v = voicesByList[l.idx] || 0;
+      pb      += Math.round(v * state[l.idx] / 100);
+      moudenc += Math.round(v * (100 - state[l.idx]) / 100);
+    });
+    return { pb, moudenc };
+  }
+
+  function renderResult() {
+    const { pb, moudenc } = compute();
+    const total  = pb + moudenc;
+    const pbPct  = total ? pct(pb, total)      : 0;
+    const mPct   = total ? pct(moudenc, total) : 0;
+    const mWins  = moudenc >= pb;
+    const mBarW  = total ? Math.round(moudenc / total * 100) : 50;
+    const winner = mWins ? MOUD_NAME : PB_NAME;
+
+    document.getElementById('sim-result').innerHTML = `
+      <div class="sim-finalist ${mWins ? 'winner' : ''}">
+        <div class="sim-finalist-head">
+          <div class="sim-swatch" style="background:${MOUD_COLOR}"></div>
+          <div class="sim-finalist-name">${MOUD_NAME}</div>
+          <div class="sim-finalist-pct">${mPct}%</div>
+        </div>
+        <div class="sim-finalist-votes">${moudenc.toLocaleString('fr')} voix</div>
+      </div>
+      <div class="sim-split-bar">
+        <div class="sim-split-m" style="width:${mBarW}%"></div>
+        <div class="sim-split-pb"></div>
+      </div>
+      <div class="sim-finalist ${!mWins ? 'winner' : ''}">
+        <div class="sim-finalist-head">
+          <div class="sim-swatch" style="background:${PB_COLOR}"></div>
+          <div class="sim-finalist-name">${PB_NAME}</div>
+          <div class="sim-finalist-pct">${pbPct}%</div>
+        </div>
+        <div class="sim-finalist-votes">${pb.toLocaleString('fr')} voix</div>
+      </div>
+      <div class="sim-winner-tag">En tête : ${winner}</div>
+    `;
+  }
+
+  // Render slider rows (toutes les listes)
+  document.getElementById('sim-slider-rows').innerHTML = sorted.map(l => {
+    const v    = voicesByList[l.idx] || 0;
+    const vPct = totalExprimés ? pct(v, totalExprimés) : 0;
+    return `
+      <div class="sim-row">
+        <div class="sim-row-info">
+          <div class="sim-swatch" style="background:${l.color}"></div>
+          <div>
+            <div class="sim-name">${candidateLabel(l)}</div>
+            <div class="sim-1r">${v.toLocaleString('fr')} voix · ${vPct}%</div>
+          </div>
+        </div>
+        <div class="sim-pct-m" data-idx="${l.idx}-m">${100 - state[l.idx]}%</div>
+        <input type="range" class="sim-range" min="0" max="100" value="${state[l.idx]}" data-idx="${l.idx}">
+        <div class="sim-pct-pb" data-idx="${l.idx}-pb">${state[l.idx]}%</div>
+      </div>
+    `;
+  }).join('');
+
+  // Wire sliders
+  document.getElementById('sim-slider-rows').addEventListener('input', e => {
+    if (!e.target.classList.contains('sim-range')) return;
+    const idx = parseInt(e.target.dataset.idx);
+    state[idx] = parseInt(e.target.value);
+    document.querySelector(`[data-idx="${idx}-pb"]`).textContent = state[idx] + '%';
+    document.querySelector(`[data-idx="${idx}-m"]`).textContent  = (100 - state[idx]) + '%';
+    renderResult();
+  });
+
+  renderResult();
+
+  // Show scroll hint
+  document.getElementById('scroll-hint').classList.remove('hidden');
+
+  // Hide hint when sim is in view
+  const observer = new IntersectionObserver(entries => {
+    document.getElementById('scroll-hint').classList.toggle('hidden', entries[0].isIntersecting);
+  }, { threshold: 0.1 });
+  observer.observe(document.getElementById('sim'));
+}
+
 function renderGeoJSON(geojson) {
   // Count bureaus won per list
   const winCount = {};
@@ -1079,6 +1495,9 @@ function renderGeoJSON(geojson) {
         <div class="vs-votes">${l.totalVoices.toLocaleString('fr')}</div>
       </div>`;
   }).join('');
+
+  // Simulator
+  initSimulator(totalVoicesByList, totalExprimés);
 
   // Global stats
   const participation = totalInscrits ? pct(totalVotants, totalInscrits) : 0;
