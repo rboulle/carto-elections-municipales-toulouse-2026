@@ -1037,13 +1037,6 @@
 <!-- Votes summary -->
 <div id="votes-summary">
   <div class="vs-title">Voix par liste</div>
-  <div class="vs-header">
-    <div class="vs-header-spacer"></div>
-    <div class="vs-header-name">Liste</div>
-    <div class="vs-header-bar"></div>
-    <div class="vs-header-pct">Score</div>
-    <div class="vs-header-votes">Nb de voix</div>
-  </div>
   <div id="vs-rows"></div>
 </div>
 
@@ -1558,7 +1551,14 @@ function renderGeoJSON(geojson) {
     .sort((a, b) => b.totalVoices - a.totalVoices);
   const maxVoices = sortedByVotes[0]?.totalVoices || 1;
 
-  document.getElementById('vs-rows').innerHTML = sortedByVotes.map(l => {
+  document.getElementById('vs-rows').innerHTML = `
+    <div class="vs-header">
+      <div class="vs-header-spacer"></div>
+      <div class="vs-header-name">Liste</div>
+      <div class="vs-header-bar"></div>
+      <div class="vs-header-pct">Score</div>
+      <div class="vs-header-votes">Nb de voix</div>
+    </div>` + sortedByVotes.map(l => {
     const barWidth = Math.round(l.totalVoices / maxVoices * 100);
     const pctVal   = totalExprimés ? pct(l.totalVoices, totalExprimés) : 0;
     return `
