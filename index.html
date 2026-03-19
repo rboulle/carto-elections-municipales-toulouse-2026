@@ -156,14 +156,36 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
 
+    .legend-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 9px;
+    }
+
     .legend-title {
       font-size: 10px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--muted);
-      margin-bottom: 9px;
       font-weight: 600;
     }
+
+    .legend-close {
+      width: 18px; height: 18px;
+      display: flex; align-items: center; justify-content: center;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1;
+      border-radius: 3px;
+      padding: 0;
+      margin-left: 8px;
+      flex-shrink: 0;
+    }
+    .legend-close:hover { background: var(--bg); color: var(--text); }
 
     .legend-item {
       display: flex;
@@ -1071,7 +1093,10 @@
 
 <!-- Legend -->
 <div id="legend">
-  <div class="legend-title">Listes en tête</div>
+  <div class="legend-header">
+    <div class="legend-title">Listes en tête</div>
+    <button class="legend-close" title="Fermer" onclick="document.getElementById('legend').style.display='none'">×</button>
+  </div>
   <div id="legend-items"></div>
 </div>
 
