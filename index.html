@@ -70,6 +70,20 @@
       margin-top: 3px;
     }
 
+    .credit {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .credit a {
+      color: var(--muted);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .credit a:hover { color: var(--accent); }
+
     /* Global stats */
     #global-stats {
       display: flex;
@@ -787,7 +801,7 @@
     /* Slider rows */
     .sim-rows-head {
       display: grid;
-      grid-template-columns: 1fr 44px 120px 44px;
+      grid-template-columns: 1fr 90px 100px 130px;
       gap: 8px;
       padding: 0 12px 6px;
       border-bottom: 1px solid var(--border);
@@ -799,6 +813,7 @@
       letter-spacing: 0.06em;
       color: var(--muted);
       font-weight: 600;
+      line-height: 1.3;
     }
 
     .sim-rows-head span:nth-child(2),
@@ -807,7 +822,7 @@
 
     .sim-row {
       display: grid;
-      grid-template-columns: 1fr 44px 120px 44px;
+      grid-template-columns: 1fr 90px 100px 130px;
       gap: 8px;
       align-items: center;
       padding: 8px 12px;
@@ -964,6 +979,7 @@
       <div class="eyebrow">Élections municipales · 15 mars 2026 · 1<sup>er</sup> tour</div>
       <h1>Toulouse par bureau <span>de vote</span></h1>
       <div class="subtitle">Couleur = liste arrivée en tête dans chaque bureau</div>
+      <div class="credit">par <a href="https://github.com/rboulle/carto-elections-municipales-toulouse-2026" target="_blank" rel="noopener">rboulle</a></div>
     </div>
     <div id="global-stats"></div>
   </div>
@@ -1021,9 +1037,9 @@
           <div class="sim-section-label">Report estimé vers Piquemal / Briançon — ajustez chaque liste</div>
           <div class="sim-rows-head">
             <span>Liste · 1er tour</span>
-            <span>→ M</span>
+            <span>Vers Moudenc</span>
             <span></span>
-            <span>→ P/B</span>
+            <span>Vers Piquemal/Briançon</span>
           </div>
           <div id="sim-slider-rows"></div>
         </div>
