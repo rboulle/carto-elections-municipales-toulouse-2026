@@ -85,16 +85,22 @@
 
     .header-sub-sep { opacity: 0.4; }
 
-    /* View toggle */
-    .view-toggle {
+    /* Round + view toggle */
+    .round-toggle {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 6px;
+      width: fit-content;
+    }
+
+    .vt-row {
       display: flex;
       gap: 2px;
-      margin-top: 6px;
       background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 4px;
       padding: 2px;
-      width: fit-content;
     }
 
     .vt-btn {
@@ -115,6 +121,19 @@
 
     .vt-btn:hover { color: var(--text); }
     .vt-btn.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .vt-btn-pending { opacity: 0.45; }
+    .r2-only { display: none; }
+
+    .r2-banner {
+      font-size: 11px;
+      color: var(--muted);
+      padding: 4px 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      display: none;
+    }
+    .r2-banner.visible { display: block; }
 
     /* Participation gradient legend */
     .legend-gradient {
@@ -624,6 +643,40 @@
       flex-shrink: 0;
     }
 
+    .dp-round-tabs {
+      display: flex;
+      gap: 2px;
+      margin-top: 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px;
+      width: fit-content;
+    }
+
+    .dp-rtab {
+      font-family: inherit;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: none;
+      border: none;
+      border-radius: 3px;
+      padding: 3px 8px;
+      cursor: pointer;
+    }
+    .dp-rtab.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+    .dp-r2-delta {
+      padding: 6px 14px;
+      font-size: 12px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    .dp-r2-delta strong { color: var(--text); }
+
     /* ── Votes summary ───────────────────────────────────────── */
     #votes-summary {
       position: fixed;
@@ -1054,10 +1107,9 @@
       }
       .title-block .eyebrow { flex: 0 0 100%; }
       .title-block h1 { flex: 1 1 auto; }
-      .view-toggle {
-        margin-top: 0;
-        flex: 0 0 auto;
-        align-self: center;
+      .round-toggle {
+        margin-top: 4px;
+        flex: 0 0 100%;
       }
       .vt-btn { padding: 3px 8px; }
 
@@ -1149,9 +1201,18 @@
         <span class="header-sub-sep">·</span>
         <span>Dataviz par <a href="https://www.linkedin.com/in/remi-boulle/" target="_blank" rel="noopener">Rémi Boulle</a> avec Claude Code · Source : <a href="https://www.data.gouv.fr" target="_blank" rel="noopener">data.gouv.fr</a></span>
       </div>
-      <div class="view-toggle">
-        <button id="btn-results" class="vt-btn active" onclick="setViewMode('results')">Résultats</button>
-        <button id="btn-participation" class="vt-btn" onclick="setViewMode('participation')">Participation</button>
+      <div class="round-toggle">
+        <div class="vt-row" id="row-round">
+          <button id="btn-r1" class="vt-btn active" onclick="setRound('r1')">1er tour</button>
+          <button id="btn-r2" class="vt-btn" onclick="setRound('r2')">2e tour</button>
+        </div>
+        <div class="vt-row" id="row-mode">
+          <button id="btn-results" class="vt-btn active" onclick="setViewMode('results')">Résultats</button>
+          <button id="btn-participation" class="vt-btn" onclick="setViewMode('participation')">Participation</button>
+          <button id="btn-surplus" class="vt-btn r2-only" onclick="setViewMode('surplus')">Surplus votants</button>
+          <button id="btn-transfer" class="vt-btn r2-only" onclick="setViewMode('transfer')">Report des voix</button>
+        </div>
+        <div id="r2-banner" class="r2-banner"></div>
       </div>
     </div>
     <div id="global-stats"></div>
@@ -1267,11 +1328,22 @@ const LISTS = [
   { idx: 9, candidate: 'V. Pedinotti',   party: '',    color: '#26C6DA' },
 ];
 
+// votes[0] = Moudenc, votes[1] = Piquemal
+const R2_LISTS = [
+  { idx: 0, candidate: 'JL. Moudenc', party: 'DVD', color: '#42A5F5' },
+  { idx: 1, candidate: 'F. Piquemal', party: 'LFI', color: '#EF5350' },
+];
+
 // ── State ──────────────────────────────────────────────────────────────────
 
 let map, geojsonLayer;
 let viewMode = 'results';
+let round = 'r1';
+let _hasR2 = false;
 let _activeWinners = [];
+let _activeWinnersR2 = [];
+let _transferCounts = { mm: 0, pp: 0, om: 0, op: 0 };
+let _statsR1 = null, _statsR2 = null;
 
 // ── Init map ───────────────────────────────────────────────────────────────
 
@@ -1333,8 +1405,57 @@ function getParticipationColor(r) {
   return lerpColor(PART_COLOR_LOW, PART_COLOR_HIGH, t);
 }
 
+function getWinnerR2(r2) {
+  return r2.votes[0] >= r2.votes[1] ? R2_LISTS[0] : R2_LISTS[1];
+}
+
+function getZoneColorR2(winner, r2) {
+  const total = r2.votes[0] + r2.votes[1];
+  if (!total) return winner.color;
+  const score = r2.votes[winner.idx] / total;
+  const t = Math.max(0, Math.min(1, (score - SCORE_MIN) / (SCORE_MAX - SCORE_MIN)));
+  if (winner.idx === 0) return lerpColor('#BBDEFB', '#1565C0', t); // Moudenc
+  if (winner.idx === 1) return lerpColor('#FFCDD2', '#B71C1C', t); // Piquemal
+  return winner.color;
+}
+
+const SURPLUS_MAX = 0.15;
+const SURPLUS_COLOR_NEG  = '#1976D2'; // moins de votants : bleu
+const SURPLUS_COLOR_NEUT = '#E8E3DA'; // neutre
+const SURPLUS_COLOR_POS  = '#E65100'; // plus de votants : orange
+
+function getSurplusColor(r, r2) {
+  if (!r || !r2 || !r.i || !r2.i) return '#e0dbd4';
+  const delta = (r2.v / r2.i) - (r.v / r.i);
+  const t = Math.min(1, Math.abs(delta) / SURPLUS_MAX);
+  return delta < 0
+    ? lerpColor(SURPLUS_COLOR_NEUT, SURPLUS_COLOR_NEG, t)
+    : lerpColor(SURPLUS_COLOR_NEUT, SURPLUS_COLOR_POS, t);
+}
+
+function getTransferColor(feature) {
+  const w1 = feature._winner;
+  const w2 = feature._winnerR2;
+  if (!w1 || !w2) return '#e0dbd4';
+  const r1M = w1.idx === 4;
+  const r2M = w2.idx === 0;
+  if  (r1M && r2M)  return '#1565C0'; // Moudenc → Moudenc
+  if (!r1M && !r2M) return '#B71C1C'; // Gauche  → Piquemal
+  if (!r1M && r2M)  return '#90CAF9'; // Gauche  → Moudenc
+  return '#EF9A9A';                   // Moudenc → Piquemal
+}
+
 function getFeatureColor(feature) {
-  const r = feature.properties.r;
+  const r  = feature.properties.r;
+  const r2 = feature.properties.r2;
+  if (round === 'r2') {
+    if (!r2) return '#e0dbd4';
+    if (viewMode === 'participation') return getParticipationColor(r2);
+    if (viewMode === 'surplus')       return getSurplusColor(r, r2);
+    if (viewMode === 'transfer')      return getTransferColor(feature);
+    const winner = feature._winnerR2;
+    return winner ? getZoneColorR2(winner, r2) : '#ccc';
+  }
   if (viewMode === 'participation') return getParticipationColor(r);
   const winner = feature._winner;
   return winner ? getZoneColor(winner, r) : '#ccc';
@@ -1343,19 +1464,57 @@ function getFeatureColor(feature) {
 function updateLegend(mode) {
   const legendItems = document.getElementById('legend-items');
   const legendTitle = document.querySelector('.legend-title');
+
   if (mode === 'participation') {
-    legendTitle.textContent = 'Taux de participation';
+    legendTitle.textContent = round === 'r2' ? 'Participation 2e tour' : 'Taux de participation';
     const steps = 5;
-    const stops = Array.from({ length: steps }, (_, i) => {
-      const t = i / (steps - 1);
-      return lerpColor(PART_COLOR_LOW, PART_COLOR_HIGH, t);
-    });
+    const stops = Array.from({ length: steps }, (_, i) => lerpColor(PART_COLOR_LOW, PART_COLOR_HIGH, i / (steps - 1)));
     legendItems.innerHTML = `
       <div class="legend-gradient" style="background: linear-gradient(to right, ${stops.join(',')})"></div>
       <div class="legend-gradient-labels">
         <span>≤ ${Math.round(PART_MIN * 100)}%</span>
         <span>≥ ${Math.round(PART_MAX * 100)}%</span>
       </div>`;
+
+  } else if (mode === 'surplus') {
+    legendTitle.textContent = 'Surplus de votants';
+    const stopsNeg = Array.from({ length: 3 }, (_, i) => lerpColor(SURPLUS_COLOR_NEG, SURPLUS_COLOR_NEUT, i / 2));
+    const stopsPos = Array.from({ length: 3 }, (_, i) => lerpColor(SURPLUS_COLOR_NEUT, SURPLUS_COLOR_POS, i / 2));
+    const allStops = [...stopsNeg, ...stopsPos.slice(1)];
+    legendItems.innerHTML = `
+      <div class="legend-gradient" style="background: linear-gradient(to right, ${allStops.join(',')})"></div>
+      <div class="legend-gradient-labels">
+        <span>−${Math.round(SURPLUS_MAX * 100)} pp</span>
+        <span>0</span>
+        <span>+${Math.round(SURPLUS_MAX * 100)} pp</span>
+      </div>`;
+
+  } else if (mode === 'transfer') {
+    legendTitle.textContent = 'Report des voix';
+    const cats = [
+      { color: '#1565C0', label: 'Moudenc × 2',        count: _transferCounts.mm },
+      { color: '#B71C1C', label: 'Gauche × 2',          count: _transferCounts.pp },
+      { color: '#90CAF9', label: 'Gauche → Moudenc',    count: _transferCounts.om },
+      { color: '#EF9A9A', label: 'Moudenc → Piquemal',  count: _transferCounts.op },
+    ];
+    legendItems.innerHTML = cats.map(c => `
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:${c.color}"></div>
+        <div class="legend-name">${c.label}</div>
+        <div class="legend-count">${c.count} BV</div>
+      </div>
+    `).join('');
+
+  } else if (round === 'r2') {
+    legendTitle.textContent = 'Résultats 2e tour';
+    legendItems.innerHTML = _activeWinnersR2.map(l => `
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:${l.color}"></div>
+        <div class="legend-name">${candidateLabel(l)}</div>
+        <div class="legend-count">${l.count} BV</div>
+      </div>
+    `).join('');
+
   } else {
     legendTitle.textContent = 'Listes en tête';
     legendItems.innerHTML = _activeWinners.map(l => `
@@ -1370,26 +1529,94 @@ function updateLegend(mode) {
 
 function setViewMode(mode) {
   viewMode = mode;
-  document.getElementById('btn-results').classList.toggle('active', mode === 'results');
-  document.getElementById('btn-participation').classList.toggle('active', mode === 'participation');
-  document.getElementById('header-sub-mode').textContent = mode === 'results'
-    ? 'Couleur = liste arrivée en tête dans chaque bureau'
-    : 'Couleur = taux de participation par bureau de vote';
-  document.getElementById('votes-summary').style.display = mode === 'participation' ? 'none' : '';
+  ['results', 'participation', 'surplus', 'transfer'].forEach(m => {
+    const btn = document.getElementById('btn-' + m);
+    if (btn) btn.classList.toggle('active', m === mode);
+  });
+  const modeLabels = {
+    results:       round === 'r2' ? 'Couleur = liste en tête au 2nd tour par bureau'         : 'Couleur = liste arrivée en tête dans chaque bureau',
+    participation: round === 'r2' ? 'Couleur = taux de participation au 2nd tour'             : 'Couleur = taux de participation par bureau de vote',
+    surplus:       'Couleur = variation de participation entre les 2 tours',
+    transfer:      'Couleur = évolution du résultat entre les 2 tours',
+  };
+  document.getElementById('header-sub-mode').textContent = modeLabels[mode] || '';
+  document.getElementById('votes-summary').style.display =
+    (round === 'r1' && mode === 'results') ? '' : 'none';
   if (geojsonLayer) {
     const opacity = mode === 'participation' ? 0.75 : 0.55;
     geojsonLayer.setStyle(feature => ({
-      fillColor: getFeatureColor(feature),
+      fillColor:   getFeatureColor(feature),
       fillOpacity: opacity,
-      color: 'rgba(0,0,0,0.5)',
-      weight: 0.8,
-      opacity: 1,
+      color:       'rgba(0,0,0,0.5)',
+      weight:      0.8,
+      opacity:     1,
     }));
     if (selectedLayer) {
       selectedLayer.setStyle({ fillOpacity: 0.85, weight: 2, color: '#1a1714' });
     }
   }
   updateLegend(mode);
+}
+
+function setupRoundUI() {
+  const btn = document.getElementById('btn-r2');
+  if (!_hasR2) {
+    btn.classList.add('vt-btn-pending');
+  } else {
+    btn.classList.remove('vt-btn-pending');
+  }
+}
+
+function setRound(r) {
+  if (r === 'r2' && !_hasR2) {
+    const banner = document.getElementById('r2-banner');
+    banner.textContent = 'En attente des résultats officiels définitifs du 2nd tour';
+    banner.classList.add('visible');
+    setTimeout(() => banner.classList.remove('visible'), 3000);
+    return;
+  }
+  round = r;
+  document.getElementById('btn-r1').classList.toggle('active', r === 'r1');
+  document.getElementById('btn-r2').classList.toggle('active', r === 'r2');
+  document.querySelectorAll('.r2-only').forEach(el => {
+    el.style.display = r === 'r2' ? 'inline-block' : '';
+  });
+  document.querySelector('#header .eyebrow').innerHTML = r === 'r1'
+    ? 'Élections municipales · 15 mars 2026 · 1<sup>er</sup> tour'
+    : 'Élections municipales · 29 mars 2026 · 2<sup>e</sup> tour';
+  updateGlobalStats(r);
+  setViewMode('results');
+}
+
+function updateGlobalStats(r) {
+  const stats = r === 'r2' ? _statsR2 : _statsR1;
+  if (!stats) return;
+  const participation = stats.inscrits ? pct(stats.votants, stats.inscrits) : 0;
+  let deltaHtml = '';
+  if (r === 'r2' && _statsR1) {
+    const delta = stats.votants - _statsR1.votants;
+    const sign  = delta >= 0 ? '+' : '';
+    deltaHtml = `
+    <div class="stat-pill">
+      <span class="val" style="color:${delta >= 0 ? '#E65100' : '#1976D2'}">${sign}${delta.toLocaleString('fr')}</span>
+      <span class="lbl">Votants vs R1</span>
+    </div>`;
+  }
+  document.getElementById('global-stats').innerHTML = `
+    <div class="stat-pill">
+      <span class="val">${participation}%</span>
+      <span class="lbl">Participation</span>
+    </div>
+    <div class="stat-pill">
+      <span class="val">${stats.bv}</span>
+      <span class="lbl">Bureaux de vote</span>
+    </div>
+    <div class="stat-pill">
+      <span class="val">${stats.votants.toLocaleString('fr')}</span>
+      <span class="lbl">Votants</span>
+    </div>
+    ${deltaHtml}
+  `;
 }
 
 function pct(v, total) {
@@ -1422,14 +1649,66 @@ let selectedLayer = null;
 
 function openPanel(feature) {
   const props = feature.properties;
-  const r = props.r;
-  const total = getTotal(r);
-  const winner = getWinner(r);
+  const hasFeatureR2 = !!props.r2;
+  const initRound = (hasFeatureR2 && round === 'r2') ? 'r2' : 'r1';
+
+  detailPanel._feature = feature;
+
+  const tabsHtml = hasFeatureR2 ? `
+    <div class="dp-round-tabs" id="dp-round-tabs">
+      <button class="dp-rtab ${initRound === 'r1' ? 'active' : ''}" data-r="r1">1er tour</button>
+      <button class="dp-rtab ${initRound === 'r2' ? 'active' : ''}" data-r="r2">2e tour</button>
+    </div>` : '';
+
+  detailPanel.innerHTML = `
+    <div class="dp-header">
+      <div class="dp-bureau">Bureau n°${props.b}</div>
+      <div class="dp-lieu">${props.n || '—'}</div>
+      <div class="dp-adresse">${props.a || ''}</div>
+      ${tabsHtml}
+      <button class="dp-close" id="dp-close-btn" title="Fermer">×</button>
+    </div>
+    <div id="dp-content"></div>
+  `;
+
+  document.getElementById('dp-close-btn').addEventListener('click', closePanel);
+
+  if (hasFeatureR2) {
+    document.getElementById('dp-round-tabs').addEventListener('click', e => {
+      const btn = e.target.closest('.dp-rtab');
+      if (!btn) return;
+      document.querySelectorAll('.dp-rtab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderPanelContent(detailPanel._feature, btn.dataset.r);
+    });
+  }
+
+  renderPanelContent(feature, initRound);
+
+  detailPanel.classList.add('open');
+  document.body.classList.add('panel-open');
+  setTimeout(() => map.invalidateSize(), 260);
+}
+
+function renderPanelContent(feature, panelRound) {
+  const props = feature.properties;
+  const r     = panelRound === 'r2' ? props.r2 : props.r;
+  const lists  = panelRound === 'r2' ? R2_LISTS : LISTS;
+  const total  = r.votes.reduce((s, v) => s + v, 0);
+  const winner = panelRound === 'r2' ? getWinnerR2(r) : getWinner(r);
   const participation = r.i ? pct(r.v, r.i) : 0;
 
-  const sorted = LISTS.map(l => ({ ...l, v: getVoices(r, l) }))
+  const sorted = lists
+    .map(l => ({ ...l, v: r.votes[l.idx] || 0 }))
     .filter(l => l.v > 0)
     .sort((a, b) => b.v - a.v);
+
+  let extraHtml = '';
+  if (panelRound === 'r2' && props.r) {
+    const delta = r.v - props.r.v;
+    const sign  = delta >= 0 ? '+' : '';
+    extraHtml = `<div class="dp-r2-delta">Votants vs 1er tour : <strong>${sign}${delta.toLocaleString('fr')}</strong></div>`;
+  }
 
   const rows = sorted.map((l, i) => `
     <tr class="${l.idx === winner.idx ? 'winner' : ''}">
@@ -1453,13 +1732,7 @@ function openPanel(feature) {
     </tr>
   `).join('');
 
-  detailPanel.innerHTML = `
-    <div class="dp-header">
-      <div class="dp-bureau">Bureau n°${props.b}</div>
-      <div class="dp-lieu">${props.n || '—'}</div>
-      <div class="dp-adresse">${props.a || ''}</div>
-      <button class="dp-close" id="dp-close-btn" title="Fermer">×</button>
-    </div>
+  document.getElementById('dp-content').innerHTML = `
     <div class="dp-stats">
       <div class="dp-stat">
         <span class="dp-stat-val">${participation} %</span>
@@ -1474,6 +1747,7 @@ function openPanel(feature) {
         <div class="dp-stat-lbl">Inscrits</div>
       </div>
     </div>
+    ${extraHtml}
     <div class="dp-table-wrap">
       <table class="dp-table">
         <thead>
@@ -1488,12 +1762,6 @@ function openPanel(feature) {
       </table>
     </div>
   `;
-
-  document.getElementById('dp-close-btn').addEventListener('click', closePanel);
-
-  detailPanel.classList.add('open');
-  document.body.classList.add('panel-open');
-  setTimeout(() => map.invalidateSize(), 260);
 }
 
 function closePanel() {
@@ -1512,38 +1780,84 @@ const tooltip = document.getElementById('tooltip');
 
 function showTooltip(e, feature) {
   const props = feature.properties;
-  const r = props.r;
-  const total = getTotal(r);
-  const winner = getWinner(r);
-  const participation = r.i ? pct(r.v, r.i) : 0;
+  const r  = props.r;
+  const r2 = props.r2;
 
-  // Sort lists by votes desc
-  const sorted = LISTS.map(l => ({ ...l, v: getVoices(r, l) }))
-    .filter(l => l.v > 0)
-    .sort((a, b) => b.v - a.v);
+  let bodyHtml;
 
-  const barsHtml = sorted.map(l => `
-    <div class="tt-bar-row">
-      <div class="tt-bar-name" title="${candidateLabel(l)}">${l.candidate}</div>
-      <div class="tt-bar-track">
-        <div class="tt-bar-fill" style="width:${pct(l.v, total)}%;background:${l.color}"></div>
+  if (round === 'r2' && r2) {
+    if (viewMode === 'surplus') {
+      const rate1 = r.i  ? pct(r.v,  r.i)  : 0;
+      const rate2 = r2.i ? pct(r2.v, r2.i) : 0;
+      const delta = rate2 - rate1;
+      const sign  = delta >= 0 ? '+' : '';
+      const diffV = r2.v - r.v;
+      const signV = diffV >= 0 ? '+' : '';
+      bodyHtml = `
+        <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px">
+          <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px">${sign}${delta.toFixed(1)} pp</div>
+          <div style="font-size:11px;color:var(--muted)">1er tour : ${rate1}% · 2e tour : ${rate2}%</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">${signV}${diffV.toLocaleString('fr')} votants</div>
+        </div>`;
+    } else if (viewMode === 'transfer') {
+      const w1 = feature._winner;
+      const w2 = feature._winnerR2;
+      bodyHtml = `
+        <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px;font-size:11px">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
+            <div style="width:8px;height:8px;border-radius:2px;background:${w1.color};flex-shrink:0"></div>
+            <span style="color:var(--muted)">R1 :</span> <strong>${candidateLabel(w1)}</strong>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <div style="width:8px;height:8px;border-radius:2px;background:${w2.color};flex-shrink:0"></div>
+            <span style="color:var(--muted)">R2 :</span> <strong>${candidateLabel(w2)}</strong>
+          </div>
+        </div>`;
+    } else {
+      const total2  = r2.votes[0] + r2.votes[1];
+      const winner2 = feature._winnerR2;
+      const part2   = r2.i ? pct(r2.v, r2.i) : 0;
+      const barsHtml = R2_LISTS.map(l => `
+        <div class="tt-bar-row">
+          <div class="tt-bar-name">${l.candidate}</div>
+          <div class="tt-bar-track"><div class="tt-bar-fill" style="width:${pct(r2.votes[l.idx], total2)}%;background:${l.color}"></div></div>
+          <div class="tt-bar-pct">${pct(r2.votes[l.idx], total2)}%</div>
+        </div>`).join('');
+      bodyHtml = `
+        <div class="tt-winner" style="background:${winner2.color}18;border-left:3px solid ${winner2.color}">
+          <div class="tt-winner-name">${candidateLabel(winner2)}</div>
+          <div class="tt-winner-pct">${pct(r2.votes[winner2.idx], total2)}%</div>
+        </div>
+        <div class="tt-bars">${barsHtml}</div>
+        <div class="tt-participation">Participation : ${part2}% · ${r2.v.toLocaleString('fr')} / ${r2.i.toLocaleString('fr')} inscrits</div>`;
+    }
+  } else {
+    const total  = getTotal(r);
+    const winner = getWinner(r);
+    const part   = r.i ? pct(r.v, r.i) : 0;
+    const sorted = LISTS.map(l => ({ ...l, v: getVoices(r, l) }))
+      .filter(l => l.v > 0)
+      .sort((a, b) => b.v - a.v);
+    const barsHtml = sorted.map(l => `
+      <div class="tt-bar-row">
+        <div class="tt-bar-name" title="${candidateLabel(l)}">${l.candidate}</div>
+        <div class="tt-bar-track"><div class="tt-bar-fill" style="width:${pct(l.v, total)}%;background:${l.color}"></div></div>
+        <div class="tt-bar-pct">${pct(l.v, total)}%</div>
+      </div>`).join('');
+    bodyHtml = `
+      <div class="tt-winner" style="background:${winner.color}18;border-left:3px solid ${winner.color}">
+        <div class="tt-winner-name">${candidateLabel(winner)}</div>
+        <div class="tt-winner-pct">${pct(getVoices(r, winner), total)}%</div>
       </div>
-      <div class="tt-bar-pct">${pct(l.v, total)}%</div>
-    </div>
-  `).join('');
+      <div class="tt-bars">${barsHtml}</div>
+      <div class="tt-participation">Participation : ${part}% · ${r.v.toLocaleString('fr')} / ${r.i.toLocaleString('fr')} inscrits</div>`;
+  }
 
   tooltip.innerHTML = `
     <div class="tt-bureau">Bureau n°${props.b}</div>
     <div class="tt-lieu">${props.n || '—'}</div>
     <div class="tt-adresse">${props.a || ''}</div>
-    <div class="tt-winner" style="background:${winner.color}18;border-left:3px solid ${winner.color}">
-      <div class="tt-winner-name">${candidateLabel(winner)}</div>
-      <div class="tt-winner-pct">${pct(getVoices(r, winner), total)}%</div>
-    </div>
-    <div class="tt-bars">${barsHtml}</div>
-    <div class="tt-participation">
-      Participation : ${participation}% · ${r.v.toLocaleString('fr')} / ${r.i.toLocaleString('fr')} inscrits
-    </div>
+    ${bodyHtml}
   `;
 
   tooltip.classList.remove('hidden');
@@ -1688,17 +2002,19 @@ function initSimulator(voicesByList, totalExprimés) {
 }
 
 function renderGeoJSON(geojson) {
-  // Count bureaus won per list
-  const winCount = {};
-  LISTS.forEach(l => { winCount[l.num] = 0; });
+  const winCount   = {};
+  const winCountR2 = { 0: 0, 1: 0 };
+  LISTS.forEach(l => { winCount[l.idx] = 0; });
 
   let totalInscrits = 0, totalVotants = 0, totalExprimés = 0;
+  let totalVotantsR2 = 0, totalInscritsR2 = 0;
   const totalVoicesByList = {};
   LISTS.forEach(l => { totalVoicesByList[l.idx] = 0; });
 
   // Annotate features
   geojson.features.forEach(f => {
-    const r = f.properties.r || null;
+    const r  = f.properties.r  || null;
+    const r2 = f.properties.r2 || null;
     if (r) {
       const winner = getWinner(r);
       f._winner = winner;
@@ -1708,7 +2024,36 @@ function renderGeoJSON(geojson) {
       totalExprimés += r.e;
       r.votes.forEach((v, i) => { totalVoicesByList[i] = (totalVoicesByList[i] || 0) + v; });
     }
+    if (r2) {
+      const winner2 = getWinnerR2(r2);
+      f._winnerR2 = winner2;
+      winCountR2[winner2.idx] = (winCountR2[winner2.idx] || 0) + 1;
+      totalInscritsR2 += r2.i;
+      totalVotantsR2  += r2.v;
+    }
   });
+
+  _hasR2 = geojson.features.some(f => f.properties.r2);
+
+  // Transfer counts (R1 bureau winner → R2 bureau winner)
+  _transferCounts = { mm: 0, pp: 0, om: 0, op: 0 };
+  if (_hasR2) {
+    geojson.features.forEach(f => {
+      if (!f._winner || !f._winnerR2) return;
+      const r1M = f._winner.idx === 4;
+      const r2M = f._winnerR2.idx === 0;
+      if  (r1M && r2M)  _transferCounts.mm++;
+      else if (!r1M && !r2M) _transferCounts.pp++;
+      else if (!r1M && r2M)  _transferCounts.om++;
+      else                    _transferCounts.op++;
+    });
+  }
+
+  // Active winners R2
+  _activeWinnersR2 = R2_LISTS
+    .map(l => ({ ...l, count: winCountR2[l.idx] || 0 }))
+    .filter(l => l.count > 0)
+    .sort((a, b) => b.count - a.count);
 
   geojsonLayer = L.geoJSON(geojson, {
     style: feature => ({
@@ -1777,24 +2122,18 @@ function renderGeoJSON(geojson) {
   // Simulator
   initSimulator(totalVoicesByList, totalExprimés);
 
-  // Global stats
-  const participation = totalInscrits ? pct(totalVotants, totalInscrits) : 0;
+  // Store stats for round switching
   const totalBV = geojson.features.length;
+  _statsR1 = { inscrits: totalInscrits, votants: totalVotants, bv: totalBV };
+  if (_hasR2) {
+    _statsR2 = { inscrits: totalInscritsR2, votants: totalVotantsR2, bv: totalBV };
+  }
 
-  document.getElementById('global-stats').innerHTML = `
-    <div class="stat-pill">
-      <span class="val">${participation}%</span>
-      <span class="lbl">Participation</span>
-    </div>
-    <div class="stat-pill">
-      <span class="val">${totalBV}</span>
-      <span class="lbl">Bureaux de vote</span>
-    </div>
-    <div class="stat-pill">
-      <span class="val">${totalVotants.toLocaleString('fr')}</span>
-      <span class="lbl">Votants</span>
-    </div>
-  `;
+  // Global stats
+  updateGlobalStats('r1');
+
+  // Setup round UI (pending/active state for R2 button)
+  setupRoundUI();
 }
 
 // ── Bootstrap ──────────────────────────────────────────────────────────────
