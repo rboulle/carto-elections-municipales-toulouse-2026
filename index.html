@@ -1112,6 +1112,7 @@
         flex: 0 0 100%;
       }
       .vt-btn { padding: 3px 8px; }
+      .vt-row { flex-wrap: wrap; }
 
       /* Légende : compacte */
       #legend { padding: 8px 10px; min-width: 0; }
@@ -2007,7 +2008,7 @@ function renderGeoJSON(geojson) {
   LISTS.forEach(l => { winCount[l.idx] = 0; });
 
   let totalInscrits = 0, totalVotants = 0, totalExprimés = 0;
-  let totalVotantsR2 = 0, totalInscritsR2 = 0;
+  let totalVotantsR2 = 0, totalInscritsR2 = 0, totalBVR2 = 0;
   const totalVoicesByList = {};
   LISTS.forEach(l => { totalVoicesByList[l.idx] = 0; });
 
@@ -2030,6 +2031,7 @@ function renderGeoJSON(geojson) {
       winCountR2[winner2.idx] = (winCountR2[winner2.idx] || 0) + 1;
       totalInscritsR2 += r2.i;
       totalVotantsR2  += r2.v;
+      totalBVR2++;
     }
   });
 
@@ -2126,7 +2128,7 @@ function renderGeoJSON(geojson) {
   const totalBV = geojson.features.length;
   _statsR1 = { inscrits: totalInscrits, votants: totalVotants, bv: totalBV };
   if (_hasR2) {
-    _statsR2 = { inscrits: totalInscritsR2, votants: totalVotantsR2, bv: totalBV };
+    _statsR2 = { inscrits: totalInscritsR2, votants: totalVotantsR2, bv: totalBVR2 };
   }
 
   // Global stats
