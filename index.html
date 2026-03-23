@@ -514,7 +514,6 @@
 
     .dp-stats {
       display: flex;
-      gap: 0;
       border-bottom: 1px solid var(--border);
     }
 
@@ -764,7 +763,6 @@
       text-align: right;
       color: var(--muted);
       font-variant-numeric: tabular-nums;
-      font-variant-numeric: tabular-nums;
     }
 
     /* ── Scroll hint ─────────────────────────────────────────── */
@@ -790,13 +788,24 @@
     #scroll-hint:hover { color: var(--accent); }
     #scroll-hint.hidden { opacity: 0; pointer-events: none; }
 
-    /* ── Simulator ────────────────────────────────────────────── */
-    #sim {
-      position: relative;
+    /* ── Panels wrapper (slide-up drawer) ─────────────────────── */
+    #panels-wrapper {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      top: var(--hh);
+      transform: translateY(100%);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow-y: auto;
       z-index: 200;
-      margin-top: calc(100vh - var(--hh));
       background: var(--bg);
       border-top: 2px solid var(--border);
+    }
+    #panels-wrapper.open { transform: translateY(0); }
+
+    /* ── Simulator ────────────────────────────────────────────── */
+    #sim {
       padding: 40px 24px 80px;
     }
 
@@ -806,11 +815,6 @@
     }
 
     .sim-head { margin-bottom: 28px; }
-
-
-    #sim.collapsed .sim-sub,
-    #sim.collapsed .sim-layout { display: none; }
-    #sim.collapsed { padding-bottom: 24px; }
 
     .sim-title {
       font-family: 'Playfair Display', serif;
@@ -1075,6 +1079,194 @@
       font-style: italic;
     }
 
+    /* ── OLS panel ───────────────────────────────────────────── */
+    #ols-panel {
+      padding: 40px 24px 80px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .ols-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .ols-grid {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 28px;
+      align-items: start;
+      margin-top: 28px;
+    }
+
+    @media (max-width: 780px) {
+      .ols-grid { grid-template-columns: 1fr; }
+    }
+
+    .ols-highlight {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid #F06292;
+      border-radius: 4px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+    }
+
+    .ols-highlight-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .ols-highlight-stat {
+      font-size: 28px;
+      font-weight: 700;
+      font-family: 'Playfair Display', serif;
+      color: var(--text);
+      line-height: 1.1;
+    }
+
+    .ols-highlight-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    .ols-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .ols-table thead tr {
+      border-bottom: 2px solid var(--border);
+    }
+
+    .ols-table th {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      font-weight: 600;
+      padding: 0 8px 8px 0;
+      text-align: right;
+    }
+
+    .ols-table th:first-child { text-align: left; }
+
+    .ols-table td {
+      padding: 7px 8px 7px 0;
+      border-bottom: 1px solid var(--border);
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .ols-table td:first-child {
+      text-align: left;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .ols-table tr:last-child td { border-bottom: none; }
+
+    .ols-table td.ols-pct-m { color: #1565C0; font-weight: 600; }
+    .ols-table td.ols-pct-p { color: #C62828; font-weight: 600; }
+    .ols-table td.ols-voix  { font-size: 10px; }
+
+    .ols-surplus-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 16px;
+      position: sticky;
+      top: 78px;
+    }
+
+    .ols-surplus-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .ols-surplus-total {
+      font-size: 22px;
+      font-weight: 700;
+      font-family: 'Playfair Display', serif;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .ols-surplus-bar {
+      display: flex;
+      height: 10px;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .ols-bar-m  { background: #1565C0; width: 6.4%; }
+    .ols-bar-p  { background: #C62828; flex: 1; }
+
+    .ols-surplus-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+      font-size: 11px;
+    }
+
+    .ols-surplus-name {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .ols-surplus-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .ols-surplus-pct {
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+    }
+
+    .ols-surplus-voix {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px;
+      text-align: right;
+    }
+
+    .ols-notes-link {
+      display: inline-block;
+      margin-top: 14px;
+      font-size: 11px;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+    }
+    .ols-notes-link:hover { text-decoration: underline; }
+
+    .ols-note {
+      font-size: 10px;
+      color: var(--muted);
+      font-style: italic;
+      margin-top: 14px;
+      line-height: 1.5;
+    }
+
     /* ── Mobile (≤ 640 px) ───────────────────────────────────── */
     @media (max-width: 640px) {
       /* Header : titre + stats empilés */
@@ -1210,8 +1402,8 @@
         <div class="vt-row" id="row-mode">
           <button id="btn-results" class="vt-btn active" onclick="setViewMode('results')">Résultats</button>
           <button id="btn-participation" class="vt-btn" onclick="setViewMode('participation')">Participation</button>
-          <button id="btn-surplus" class="vt-btn r2-only" onclick="setViewMode('surplus')">Surplus votants</button>
-          <button id="btn-transfer" class="vt-btn r2-only" onclick="setViewMode('transfer')">Report des voix</button>
+          <button id="btn-surplus-abs" class="vt-btn r2-only" onclick="setViewMode('surplus-abs')">Surplus votants</button>
+          <button id="btn-transfer" class="vt-btn r2-only" onclick="setViewMode('transfer')">Écart Moudenc / Piquemal</button>
         </div>
         <div id="r2-banner" class="r2-banner"></div>
       </div>
@@ -1259,6 +1451,120 @@
   Simulateur 2nd tour ↓
 </div>
 
+<div id="panels-wrapper">
+
+<!-- OLS panel — 2nd tour uniquement -->
+<section id="ols-panel" style="display:none">
+  <div class="ols-inner">
+    <div class="sim-head">
+      <div class="eyebrow">Second tour · Analyse</div>
+      <h2 class="sim-title">Report des voix effectifs estimés</h2>
+      <p class="sim-sub">
+        Estimation par régression MCO (moindres carrés) sur les 284 bureaux de vote.
+        Pour chaque liste du 1er tour, on estime la fraction des électeurs ayant voté pour chaque finaliste au 2nd tour.
+        Les petites listes (Scalli, Adrada, Menéndez, Cottrel, Pedinotti) ont des coefficients instables et ne sont pas affichées.
+      </p>
+    </div>
+
+    <div class="ols-grid">
+      <div>
+        <!-- Highlight Briançon -->
+        <div class="ols-highlight">
+          <div class="ols-highlight-label">Résultat clé · Briançon (PS)</div>
+          <div class="ols-highlight-stat">27 % vers Moudenc</div>
+          <div class="ols-highlight-sub">
+            Sur 39 245 électeurs Briançon au 1er tour,<br>
+            <strong style="color:#42A5F5">≈ 9 700 voix</strong> ont rejoint Moudenc · <strong style="color:#C62828">≈ 26 500 voix</strong> ont suivi la consigne de fusion vers Piquemal.<br>
+            (Les ≈ 8 % restants : blancs, nuls ou résidu du modèle.)
+          </div>
+        </div>
+
+        <!-- Table des reports -->
+        <div class="sim-section-label">Taux de report estimé vers chaque finaliste</div>
+        <table class="ols-table">
+          <thead>
+            <tr>
+              <th>Liste · 1er tour</th>
+              <th>Voix R1</th>
+              <th>→ Moudenc</th>
+              <th>→ Piquemal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>F. Briançon (PS)</td>
+              <td class="ols-voix">39 245</td>
+              <td class="ols-pct-m">27 %<br><span class="ols-voix">≈ 9 700</span></td>
+              <td class="ols-pct-p">73 %<br><span class="ols-voix">≈ 26 500</span></td>
+            </tr>
+            <tr>
+              <td>JL. Moudenc (DVD)</td>
+              <td class="ols-voix">58 462</td>
+              <td class="ols-pct-m">fidélité quasi-totale*</td>
+              <td class="ols-voix" style="color:var(--muted)">—</td>
+            </tr>
+            <tr>
+              <td>F. Piquemal (LFI)</td>
+              <td class="ols-voix">43 274</td>
+              <td class="ols-voix" style="color:var(--muted)">—</td>
+              <td class="ols-pct-p">fidélité quasi-totale*</td>
+            </tr>
+            <tr>
+              <td>J. Leonardelli (RN)</td>
+              <td class="ols-voix">8 447</td>
+              <td class="ols-pct-m">fidélité quasi-totale*</td>
+              <td class="ols-voix" style="color:var(--muted)">—</td>
+            </tr>
+            <tr>
+              <td>L. Meilhac</td>
+              <td class="ols-voix">2 648</td>
+              <td class="ols-pct-m">90 %<br><span class="ols-voix">≈ 2 150</span></td>
+              <td class="ols-pct-p">10 %<br><span class="ols-voix">≈ 230</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="ols-note">* Coefficients MCO &gt; 1 pour ces listes (artefact statistique sans contrainte) — interprétés comme fidélité quasi-totale. Seuls Briançon et Meilhac ont des coefficients dans [0, 1] permettant une estimation en voix.</div>
+        <a href="notes/methode-ols.html" target="_blank" class="ols-notes-link">Notes méthodologiques →</a>
+      </div>
+
+      <!-- Surplus -->
+      <div>
+        <div class="ols-surplus-box">
+          <div class="ols-surplus-label">Surplus de participation</div>
+          <div class="ols-surplus-total">+17 017 votants</div>
+          <div class="ols-surplus-bar">
+            <div class="ols-bar-m"></div>
+            <div class="ols-bar-p"></div>
+          </div>
+          <div class="ols-surplus-row">
+            <div class="ols-surplus-name">
+              <div class="ols-surplus-dot" style="background:#1565C0"></div>
+              Moudenc
+            </div>
+            <div>
+              <div class="ols-surplus-pct" style="color:#1565C0; text-align:right">6 %</div>
+              <div class="ols-surplus-voix">≈ 1 100 voix</div>
+            </div>
+          </div>
+          <div class="ols-surplus-row">
+            <div class="ols-surplus-name">
+              <div class="ols-surplus-dot" style="background:#C62828"></div>
+              Piquemal
+            </div>
+            <div>
+              <div class="ols-surplus-pct" style="color:#C62828; text-align:right">94 %</div>
+              <div class="ols-surplus-voix">≈ 15 900 voix</div>
+            </div>
+          </div>
+          <div class="ols-note">
+            Les +17 017 votants du 2nd tour étaient non-votants au 1er tour. Le MCO estime que 94 % d'entre eux ont voté Piquemal. La mobilisation a donc quasi-exclusivement bénéficié à la gauche — mais elle ne représente que ~10 % du total des votes. La victoire de Moudenc s'explique par sa base du 1er tour (58 462 voix, quasi intégralement conservées), le report quasi-total de l'électorat RN (~9 500 voix), et la fuite de 27 % des électeurs Briançon (PS) vers Moudenc (~9 700 voix) — autant que le report RN entier, et autant de voix en moins pour le bloc de gauche.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- Simulator section -->
 <section id="sim">
   <div class="sim-inner">
@@ -1268,6 +1574,7 @@
       <p class="sim-sub">
         Piquemal (LFI) et Briançon (PS) fusionnent en une liste commune.
         Ajustez le report estimé de chaque liste vers l'un des deux finalistes.
+        Les valeurs par défaut sont estimées par régression moindres carrés sur les 284 bureaux de vote.
       </p>
     </div>
 
@@ -1301,6 +1608,8 @@
     </div>
   </div>
 </section>
+
+</div><!-- #panels-wrapper -->
 
 <script>
 'use strict';
@@ -1343,7 +1652,6 @@ let round = 'r1';
 let _hasR2 = false;
 let _activeWinners = [];
 let _activeWinnersR2 = [];
-let _transferCounts = { mm: 0, pp: 0, om: 0, op: 0 };
 let _statsR1 = null, _statsR2 = null;
 
 // ── Init map ───────────────────────────────────────────────────────────────
@@ -1420,30 +1728,28 @@ function getZoneColorR2(winner, r2) {
   return winner.color;
 }
 
-const SURPLUS_MAX = 0.15;
-const SURPLUS_COLOR_NEG  = '#1976D2'; // moins de votants : bleu
-const SURPLUS_COLOR_NEUT = '#E8E3DA'; // neutre
-const SURPLUS_COLOR_POS  = '#E65100'; // plus de votants : orange
+const SURPLUS_COLOR_LOW  = '#FFFFFF';
+const SURPLUS_COLOR_HIGH = '#B71C1C';
 
-function getSurplusColor(r, r2) {
-  if (!r || !r2 || !r.i || !r2.i) return '#e0dbd4';
-  const delta = (r2.v / r2.i) - (r.v / r.i);
-  const t = Math.min(1, Math.abs(delta) / SURPLUS_MAX);
-  return delta < 0
-    ? lerpColor(SURPLUS_COLOR_NEUT, SURPLUS_COLOR_NEG, t)
-    : lerpColor(SURPLUS_COLOR_NEUT, SURPLUS_COLOR_POS, t);
+let _surplusAbsMin = 0, _surplusAbsMax = 150;
+
+function getSurplusAbsColor(r, r2) {
+  if (!r || !r2) return '#e0dbd4';
+  const delta = r2.v - r.v;
+  const range = _surplusAbsMax - _surplusAbsMin;
+  const t = range > 0 ? Math.max(0, Math.min(1, (delta - _surplusAbsMin) / range)) : 0;
+  return lerpColor(SURPLUS_COLOR_LOW, SURPLUS_COLOR_HIGH, t);
 }
 
-function getTransferColor(feature) {
-  const w1 = feature._winner;
-  const w2 = feature._winnerR2;
-  if (!w1 || !w2) return '#e0dbd4';
-  const r1M = w1.idx === 4;
-  const r2M = w2.idx === 0;
-  if  (r1M && r2M)  return '#1565C0'; // Moudenc → Moudenc
-  if (!r1M && !r2M) return '#B71C1C'; // Gauche  → Piquemal
-  if (!r1M && r2M)  return '#90CAF9'; // Gauche  → Moudenc
-  return '#EF9A9A';                   // Moudenc → Piquemal
+const MARGIN_MAX = 0.30;
+
+function getMarginColor(r2) {
+  if (!r2 || !r2.e) return '#e0dbd4';
+  const margin = (r2.votes[0] - r2.votes[1]) / r2.e;
+  const t = Math.min(1, Math.abs(margin) / MARGIN_MAX);
+  return margin >= 0
+    ? lerpColor('#E8E3DA', '#1565C0', t)
+    : lerpColor('#E8E3DA', '#B71C1C', t);
 }
 
 function getFeatureColor(feature) {
@@ -1452,8 +1758,8 @@ function getFeatureColor(feature) {
   if (round === 'r2') {
     if (!r2) return '#e0dbd4';
     if (viewMode === 'participation') return getParticipationColor(r2);
-    if (viewMode === 'surplus')       return getSurplusColor(r, r2);
-    if (viewMode === 'transfer')      return getTransferColor(feature);
+    if (viewMode === 'surplus-abs')   return getSurplusAbsColor(r, r2);
+    if (viewMode === 'transfer')      return getMarginColor(r2);
     const winner = feature._winnerR2;
     return winner ? getZoneColorR2(winner, r2) : '#ccc';
   }
@@ -1477,34 +1783,34 @@ function updateLegend(mode) {
         <span>≥ ${Math.round(PART_MAX * 100)}%</span>
       </div>`;
 
-  } else if (mode === 'surplus') {
-    legendTitle.textContent = 'Surplus de votants';
-    const stopsNeg = Array.from({ length: 3 }, (_, i) => lerpColor(SURPLUS_COLOR_NEG, SURPLUS_COLOR_NEUT, i / 2));
-    const stopsPos = Array.from({ length: 3 }, (_, i) => lerpColor(SURPLUS_COLOR_NEUT, SURPLUS_COLOR_POS, i / 2));
-    const allStops = [...stopsNeg, ...stopsPos.slice(1)];
+  } else if (mode === 'surplus-abs') {
+    legendTitle.textContent = 'Surplus de votants (nb)';
+    const steps = 5;
+    const stops = Array.from({ length: steps }, (_, i) => lerpColor(SURPLUS_COLOR_LOW, SURPLUS_COLOR_HIGH, i / (steps - 1)));
     legendItems.innerHTML = `
-      <div class="legend-gradient" style="background: linear-gradient(to right, ${allStops.join(',')})"></div>
+      <div class="legend-gradient" style="background: linear-gradient(to right, ${stops.join(',')})"></div>
       <div class="legend-gradient-labels">
-        <span>−${Math.round(SURPLUS_MAX * 100)} pp</span>
-        <span>0</span>
-        <span>+${Math.round(SURPLUS_MAX * 100)} pp</span>
+        <span>+${_surplusAbsMin} votants</span>
+        <span>+${_surplusAbsMax} votants</span>
       </div>`;
 
   } else if (mode === 'transfer') {
-    legendTitle.textContent = 'Report des voix';
-    const cats = [
-      { color: '#1565C0', label: 'Moudenc × 2',        count: _transferCounts.mm },
-      { color: '#B71C1C', label: 'Gauche × 2',          count: _transferCounts.pp },
-      { color: '#90CAF9', label: 'Gauche → Moudenc',    count: _transferCounts.om },
-      { color: '#EF9A9A', label: 'Moudenc → Piquemal',  count: _transferCounts.op },
-    ];
-    legendItems.innerHTML = cats.map(c => `
-      <div class="legend-item">
-        <div class="legend-swatch" style="background:${c.color}"></div>
-        <div class="legend-name">${c.label}</div>
-        <div class="legend-count">${c.count} BV</div>
+    legendTitle.textContent = 'Écart Moudenc / Piquemal';
+    const stepsP = Array.from({ length: 3 }, (_, i) => lerpColor('#B71C1C', '#E8E3DA', i / 2));
+    const stepsM = Array.from({ length: 3 }, (_, i) => lerpColor('#E8E3DA', '#1565C0', i / 2));
+    const allStops = [...stepsP, ...stepsM.slice(1)];
+    legendItems.innerHTML = `
+      <div class="legend-gradient" style="background: linear-gradient(to right, ${allStops.join(',')})"></div>
+      <div class="legend-gradient-labels">
+        <span>Piquemal −${Math.round(MARGIN_MAX * 100)} pp</span>
+        <span>Moudenc +${Math.round(MARGIN_MAX * 100)} pp</span>
       </div>
-    `).join('');
+      <p style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5">
+        Écart entre Moudenc et Piquemal, en points de %, au 2e tour.<br>
+        <span style="color:#1565C0;font-weight:600">Bleu</span> = Moudenc en avance ·
+        <span style="color:#B71C1C;font-weight:600">Rouge</span> = Piquemal en avance.<br>
+        Ton pâle = résultat serré.
+      </p>`;
 
   } else if (round === 'r2') {
     legendTitle.textContent = 'Résultats 2e tour';
@@ -1530,15 +1836,15 @@ function updateLegend(mode) {
 
 function setViewMode(mode) {
   viewMode = mode;
-  ['results', 'participation', 'surplus', 'transfer'].forEach(m => {
+  ['results', 'participation', 'surplus-abs', 'transfer'].forEach(m => {
     const btn = document.getElementById('btn-' + m);
     if (btn) btn.classList.toggle('active', m === mode);
   });
   const modeLabels = {
     results:       round === 'r2' ? 'Couleur = liste en tête au 2nd tour par bureau'         : 'Couleur = liste arrivée en tête dans chaque bureau',
     participation: round === 'r2' ? 'Couleur = taux de participation au 2nd tour'             : 'Couleur = taux de participation par bureau de vote',
-    surplus:       'Couleur = variation de participation entre les 2 tours',
-    transfer:      'Couleur = évolution du résultat entre les 2 tours',
+    'surplus-abs':    'Couleur = nombre de votants supplémentaires au 2e tour vs 1er tour',
+    transfer:         'Couleur = écart Moudenc − Piquemal au 2e tour (bleu = Moudenc, rouge = Piquemal)',
   };
   document.getElementById('header-sub-mode').textContent = modeLabels[mode] || '';
   document.getElementById('votes-summary').style.display =
@@ -1585,6 +1891,13 @@ function setRound(r) {
   document.querySelector('#header .eyebrow').innerHTML = r === 'r1'
     ? 'Élections municipales · 15 mars 2026 · 1<sup>er</sup> tour'
     : 'Élections municipales · 22 mars 2026 · 2<sup>e</sup> tour';
+  document.getElementById('ols-panel').style.display = r === 'r2' ? '' : 'none';
+  const btn = document.getElementById('scroll-hint');
+  const open = document.getElementById('panels-wrapper').classList.contains('open');
+  const arrow = open ? '↑' : '↓';
+  btn.textContent = r === 'r2'
+    ? `Analyse reports + hausse participation ${arrow}`
+    : `Simulateur 2nd tour ${arrow}`;
   updateGlobalStats(r);
   setViewMode('results');
 }
@@ -1787,7 +2100,7 @@ function showTooltip(e, feature) {
   let bodyHtml;
 
   if (round === 'r2' && r2) {
-    if (viewMode === 'surplus') {
+    if (viewMode === 'surplus-abs') {
       const rate1 = r.i  ? pct(r.v,  r.i)  : 0;
       const rate2 = r2.i ? pct(r2.v, r2.i) : 0;
       const delta = rate2 - rate1;
@@ -1796,9 +2109,9 @@ function showTooltip(e, feature) {
       const signV = diffV >= 0 ? '+' : '';
       bodyHtml = `
         <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px">
-          <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px">${sign}${delta.toFixed(1)} pp</div>
+          <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:2px">${signV}${diffV.toLocaleString('fr')} votants</div>
+          <div style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:4px">${sign}${delta.toFixed(1)} pp</div>
           <div style="font-size:11px;color:var(--muted)">1er tour : ${rate1}% · 2e tour : ${rate2}%</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px">${signV}${diffV.toLocaleString('fr')} votants</div>
         </div>`;
     } else if (viewMode === 'transfer') {
       const w1 = feature._winner;
@@ -1883,12 +2196,11 @@ function hideTooltip() {
 // ── Simulator ──────────────────────────────────────────────────────────────
 
 function toggleSim() {
-  const sim = document.getElementById('sim');
+  const wrapper = document.getElementById('panels-wrapper');
   const btn = document.getElementById('scroll-hint');
-  const collapsed = sim.classList.toggle('collapsed');
-  btn.textContent = collapsed ? 'Simulateur 2nd tour ↓' : 'Simulateur 2nd tour ↑';
-  if (collapsed) window.scrollTo({ top: 0, behavior: 'smooth' });
-  else sim.scrollIntoView({ behavior: 'smooth' });
+  const open = wrapper.classList.toggle('open');
+  const label = round === 'r2' ? 'Analyse reports + hausse participation' : 'Simulateur 2nd tour';
+  btn.textContent = open ? `${label} ↑` : `${label} ↓`;
 }
 
 function initSimulator(voicesByList, totalExprimés) {
@@ -1897,11 +2209,10 @@ function initSimulator(voicesByList, totalExprimés) {
   const MOUD_COLOR = '#1565C0';
   const MOUD_NAME  = 'JL. Moudenc (DVD)';
 
-  // % of each list going to P/B (0–100), remainder → Moudenc
-  // Moudenc (4) : 10% → P/B (90% fidèles)
-  // Piquemal (8) + Briançon (0) : 90% → P/B (90% fidèles)
-  // Autres : 50% par défaut
-  const DEFAULTS = { 4: 10, 8: 90, 0: 90 };
+  // % de chaque liste allant vers Piquemal/Briançon (0–100), le reste → Moudenc
+  // Valeurs estimées par régression moindres carrés sur les 284 bureaux (R1 → R2)
+  // Listes trop petites (Scalli, Adrada, Menéndez, Cottrel, Pedinotti) : coefficients instables → 50%
+  const DEFAULTS = { 0: 73, 4: 0, 5: 0, 7: 10, 8: 100 };
   const state = {};
   LISTS.forEach(l => { state[l.idx] = DEFAULTS[l.idx] ?? 50; });
 
@@ -1997,8 +2308,6 @@ function initSimulator(voicesByList, totalExprimés) {
 
   renderResult();
 
-  // Show central toggle button (starts collapsed)
-  document.getElementById('sim').classList.add('collapsed');
   document.getElementById('scroll-hint').classList.remove('hidden');
 }
 
@@ -2037,18 +2346,13 @@ function renderGeoJSON(geojson) {
 
   _hasR2 = geojson.features.some(f => f.properties.r2);
 
-  // Transfer counts (R1 bureau winner → R2 bureau winner)
-  _transferCounts = { mm: 0, pp: 0, om: 0, op: 0 };
+  // Surplus min/max (participation delta R1→R2)
   if (_hasR2) {
-    geojson.features.forEach(f => {
-      if (!f._winner || !f._winnerR2) return;
-      const r1M = f._winner.idx === 4;
-      const r2M = f._winnerR2.idx === 0;
-      if  (r1M && r2M)  _transferCounts.mm++;
-      else if (!r1M && !r2M) _transferCounts.pp++;
-      else if (!r1M && r2M)  _transferCounts.om++;
-      else                    _transferCounts.op++;
-    });
+    const deltasAbs = geojson.features
+      .filter(f => f.properties.r && f.properties.r2)
+      .map(f => f.properties.r2.v - f.properties.r.v);
+    _surplusAbsMin = Math.min(...deltasAbs);
+    _surplusAbsMax = Math.max(...deltasAbs);
   }
 
   // Active winners R2
