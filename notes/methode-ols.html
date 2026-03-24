@@ -465,9 +465,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_reproduire_lestimation">6.3. Reproduire l&#8217;estimation</a></li>
 <li><a href="#_diagramme_de_sankey_des_reports_estimés">6.4. Diagramme de Sankey des reports estimés</a></li>
 <li><a href="#_de_la_régression_aux_27_calcul_détaillé">6.5. De la régression aux 27 % : calcul détaillé</a></li>
-<li><a href="#_qualité_dajustement">6.6. Qualité d&#8217;ajustement</a></li>
-<li><a href="#_interprétation">6.7. Interprétation</a></li>
-<li><a href="#_utilisation_dans_le_simulateur">6.8. Utilisation dans le simulateur</a></li>
+<li><a href="#_les_94_de_mobilisation_en_faveur_de_piquemal_calcul_détaillé">6.6. Les 94 % de mobilisation en faveur de Piquemal : calcul détaillé</a></li>
+<li><a href="#_qualité_dajustement">6.7. Qualité d&#8217;ajustement</a></li>
+<li><a href="#_interprétation">6.8. Interprétation</a></li>
+<li><a href="#_utilisation_dans_le_simulateur">6.9. Utilisation dans le simulateur</a></li>
 </ul>
 </li>
 <li><a href="#_limite_fondamentale_linférence_écologique">7. Limite fondamentale : l&#8217;inférence écologique</a></li>
@@ -1577,7 +1578,89 @@ Le 27 % affiché dans l&#8217;application est cette valeur normalisée — c&#82
 </div>
 </div>
 <div class="sect2">
-<h3 id="_qualité_dajustement">6.6. Qualité d&#8217;ajustement</h3>
+<h3 id="_les_94_de_mobilisation_en_faveur_de_piquemal_calcul_détaillé">6.6. Les 94 % de mobilisation en faveur de Piquemal : calcul détaillé</h3>
+<div class="paragraph">
+<p>Entre les deux tours, la participation a progressé de +17 017 votants (56,5 % vers 62,6 %). Ces nouveaux votants proviennent nécessairement des non-votants du 1er tour. On applique la même normalisation qu&#8217;à l&#8217;étape 3 ci-dessus, mais cette fois sur la ligne <strong>Non-votants R1</strong> du tableau des coefficients.</p>
+</div>
+<div class="sect3">
+<h4 id="_étape_1_lire_les_coefficients_bruts">6.6.1. Étape 1 — lire les coefficients bruts</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Source</th>
+<th class="tableblock halign-left valign-top">Destination</th>
+<th class="tableblock halign-left valign-top">Coefficient brut</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Non-votants R1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">→ Moudenc (2nd tour)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(\hat{\beta}^{M}_{\text{NV}} = 0{,}006\)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Non-votants R1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">→ Piquemal (2nd tour)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(\hat{\beta}^{P}_{\text{NV}} = 0{,}085\)</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Le coefficient \(\hat{\beta}^{P}_{\text{NV}} = 0{,}085\) signifie : pour chaque non-votant au 1er tour dans un bureau, le modèle estime que \(0{,}085\) vote va vers Piquemal au 2nd tour. Les \(0{,}914\) restants correspondent aux non-votants R1 qui restent non-votants au R2 (coefficient \(\hat{\beta}^{A}_{\text{NV}} = 0{,}914\)).</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_étape_2_normaliser_entre_les_deux_finalistes">6.6.2. Étape 2 — normaliser entre les deux finalistes</h4>
+<div class="paragraph">
+<p>On ne garde que ceux qui <strong>ont effectivement voté</strong> au 2nd tour, en normalisant comme pour Briançon :</p>
+</div>
+<div class="stemblock">
+<div class="content">
+\[\text{Part Piquemal} = \frac{\hat{\beta}^{P}_{\text{NV}}}{\hat{\beta}^{M}_{\text{NV}} + \hat{\beta}^{P}_{\text{NV}}} = \frac{0{,}085}{0{,}006 + 0{,}085} = \frac{0{,}085}{0{,}091} \approx 93{,}4\,\% \approx 94\,\%\]
+</div>
+</div>
+<div class="stemblock">
+<div class="content">
+\[\text{Part Moudenc} = \frac{0{,}006}{0{,}091} \approx 6{,}6\,\% \approx 6\,\%\]
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_étape_3_convertir_en_voix_absolues">6.6.3. Étape 3 — convertir en voix absolues</h4>
+<div class="paragraph">
+<p>On applique ces proportions aux 17 017 votants supplémentaires :</p>
+</div>
+<div class="stemblock">
+<div class="content">
+\[17\,017 \times 93{,}4\,\% \approx 15\,900 \text{ voix} \to \text{Piquemal}\]
+</div>
+</div>
+<div class="stemblock">
+<div class="content">
+\[17\,017 \times 6{,}6\,\% \approx 1\,100 \text{ voix} \to \text{Moudenc}\]
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Cette estimation repose sur une <strong>approximation</strong> : le coefficient MCO décrit le comportement moyen de l&#8217;ensemble des 122 377 non-votants R1, et on l&#8217;applique ici au sous-ensemble des 17 017 qui ont effectivement voté au R2. L&#8217;hypothèse implicite est que ce sous-ensemble se comporte comme la moyenne — ce qui est raisonnable mais non garanti.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_qualité_dajustement">6.7. Qualité d&#8217;ajustement</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -1621,7 +1704,7 @@ Dans les régressions écologiques inter-tours, des valeurs élevées de \(R^2\)
 </div>
 </div>
 <div class="sect2">
-<h3 id="_interprétation">6.7. Interprétation</h3>
+<h3 id="_interprétation">6.8. Interprétation</h3>
 <div class="hdlist">
 <table>
 <tr>
@@ -1684,7 +1767,7 @@ Petites listes
 </div>
 </div>
 <div class="sect2">
-<h3 id="_utilisation_dans_le_simulateur">6.8. Utilisation dans le simulateur</h3>
+<h3 id="_utilisation_dans_le_simulateur">6.9. Utilisation dans le simulateur</h3>
 <div class="paragraph">
 <p>Les coefficients des listes robustes (Briançon, Moudenc, Piquemal, Leonardelli, Meilhac) sont utilisés comme <strong>valeurs par défaut des curseurs</strong> du simulateur de report intégré à la carte. Les petites listes conservent une valeur par défaut de 50 %.</p>
 </div>
@@ -1702,9 +1785,6 @@ Petites listes
 </div>
 <div class="paragraph">
 <p><strong>Ce que le modèle dit</strong> : les \(\beta_k\) sont des estimations de reports moyens agrégés, valides sous hypothèse forte d’homogénéité du comportement entre bureaux. En présence d’hétérogénéité non observée, ils peuvent être biaisés (ecological fallacy).</p>
-</div>
-<div class="paragraph">
-<p><strong>Ce que le modèle ne dit pas</strong> : le comportement d&#8217;un électeur individuel d&#8217;un bureau spécifique.</p>
 </div>
 <div class="paragraph">
 <p>Avec 284 bureaux couvrant des géographies très diverses (centre, périphérie nord, Mirail, quartiers résidentiels), l&#8217;hypothèse d&#8217;homogénéité est raisonnablement satisfaite.</p>
@@ -1875,7 +1955,7 @@ La participation a progressé de +6,1 points par rapport au 1er tour (56,5 % →
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-03-24 20:39:36 +0100
+Last updated 2026-03-24 21:01:15 +0100
 </div>
 </div>
 <script type="text/x-mathjax-config">
