@@ -433,6 +433,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 #footer-text{color:rgba(0,0,0,.6);font-size:.9em}}
 @media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body class="article toc2 toc-left">
 <div id="header">
@@ -446,38 +447,37 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <ul class="sectlevel2">
 <li><a href="#_variables">3.1. Variables</a></li>
 <li><a href="#_équation_du_modèle">3.2. Équation du modèle</a></li>
-<li><a href="#_illustration_avec_les_données_du_1er_tour_de_toulouse">3.3. Illustration avec les données du 1er tour de Toulouse</a></li>
+<li><a href="#_résultats_avec_les_données_du_1er_tour_à_toulouse">3.3. Résultats avec les données du 1er tour à Toulouse</a></li>
 </ul>
 </li>
 <li><a href="#_traitement_spécial_des_listes_fusionnées">4. Traitement spécial des listes fusionnées</a></li>
-<li><a href="#_pourquoi_la_régression_linéaire_multivariée_mco">5. Pourquoi la régression linéaire multivariée (MCO) ?</a>
+<li><a href="#_mais_quest_ce_quune_régression_linéaire_multivariée_mco">5. Mais qu&#8217;est ce qu&#8217;une régression linéaire multivariée (MCO) ?</a>
 <ul class="sectlevel2">
 <li><a href="#_exemple_introductif">5.1. Exemple introductif</a></li>
 <li><a href="#_exemple_avec_résidus_non_nuls">5.2. Exemple avec résidus non nuls</a></li>
-<li><a href="#_estimation_par_mco">5.3. Estimation par MCO</a></li>
-<li><a href="#_résolution_numérique_élimination_de_gauss">5.4. Résolution numérique : élimination de Gauss</a></li>
+<li><a href="#_estimation_par_mco_avec_les_données_réelles_formulation_multi_output">5.3. Estimation par MCO avec les données réelles : formulation multi-output</a></li>
 </ul>
 </li>
-<li><a href="#_qualité_du_modèle_le_coefficient_de_détermination_r">6. Qualité du modèle : le coefficient de détermination R²</a></li>
-<li><a href="#_résultats_de_la_régression_données_réelles_2026">7. Résultats de la régression — données réelles 2026</a>
+<li><a href="#_résultats_de_la_régression_données_réelles_2026">6. Résultats de la régression — données réelles 2026</a>
 <ul class="sectlevel2">
-<li><a href="#_mise_en_œuvre">7.1. Mise en œuvre</a></li>
-<li><a href="#_coefficients_estimés">7.2. Coefficients estimés</a></li>
-<li><a href="#_diagramme_de_sankey_des_reports_estimés">7.3. Diagramme de Sankey des reports estimés</a></li>
-<li><a href="#_de_la_régression_aux_27_calcul_détaillé">7.4. De la régression aux 27 % : calcul détaillé</a></li>
-<li><a href="#_qualité_dajustement">7.5. Qualité d&#8217;ajustement</a></li>
-<li><a href="#_interprétation">7.6. Interprétation</a></li>
-<li><a href="#_utilisation_dans_le_simulateur">7.7. Utilisation dans le simulateur</a></li>
+<li><a href="#_mise_en_œuvre">6.1. Mise en œuvre</a></li>
+<li><a href="#_coefficients_estimés">6.2. Coefficients estimés</a></li>
+<li><a href="#_reproduire_lestimation">6.3. Reproduire l&#8217;estimation</a></li>
+<li><a href="#_diagramme_de_sankey_des_reports_estimés">6.4. Diagramme de Sankey des reports estimés</a></li>
+<li><a href="#_de_la_régression_aux_27_calcul_détaillé">6.5. De la régression aux 27 % : calcul détaillé</a></li>
+<li><a href="#_qualité_dajustement">6.6. Qualité d&#8217;ajustement</a></li>
+<li><a href="#_interprétation">6.7. Interprétation</a></li>
+<li><a href="#_utilisation_dans_le_simulateur">6.8. Utilisation dans le simulateur</a></li>
 </ul>
 </li>
-<li><a href="#_limite_fondamentale_linférence_écologique">8. Limite fondamentale : l&#8217;inférence écologique</a></li>
-<li><a href="#_données_de_référence">9. Données de référence</a>
+<li><a href="#_limite_fondamentale_linférence_écologique">7. Limite fondamentale : l&#8217;inférence écologique</a></li>
+<li><a href="#_données_de_référence">8. Données de référence</a>
 <ul class="sectlevel2">
-<li><a href="#_résultats_du_1er_tour_15_mars_2026">9.1. Résultats du 1er tour — 15 mars 2026</a></li>
-<li><a href="#_résultats_du_2nd_tour_22_mars_2026">9.2. Résultats du 2nd tour — 22 mars 2026</a></li>
+<li><a href="#_résultats_du_1er_tour_15_mars_2026">8.1. Résultats du 1er tour — 15 mars 2026</a></li>
+<li><a href="#_résultats_du_2nd_tour_22_mars_2026">8.2. Résultats du 2nd tour — 22 mars 2026</a></li>
 </ul>
 </li>
-<li><a href="#_références">10. Références</a></li>
+<li><a href="#_références">9. Références</a></li>
 </ul>
 </div>
 </div>
@@ -486,10 +486,13 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_contexte_et_objectif">1. Contexte et objectif</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Au second tour des municipales de Toulouse 2026, seules deux listes s&#8217;affrontent : Moudenc (DVD) et Piquemal (LFI, avec fusion Briançon PS). Pour chaque bureau de vote, on connaît les résultats complets du 1er tour (10 listes) et du 2nd tour (2 listes). L&#8217;objectif est d&#8217;estimer <strong>dans quelle proportion les électeurs de chaque liste du 1er tour ont reporté leurs voix</strong> vers l&#8217;un des deux finalistes.</p>
+<p>Au second tour des municipales de Toulouse 2026, seules deux listes s&#8217;affrontent : Moudenc (DVD) et Piquemal (LFI, avec fusion Briançon PS). Pour chaque bureau de vote, on connaît les résultats complets du 1er tour (10 listes) et du 2nd tour (2 listes). L&#8217;objectif est d&#8217;estimer <strong>dans quelle proportion les électeurs de chaque liste du 1er tour ont reporté leurs voix</strong> vers l&#8217;un des deux finalistes. On tente aussi d&#8217;estimer le comportement des nouveaux votants entre les deux tours.</p>
 </div>
 <div class="paragraph">
 <p>Ce document explique la méthode statistique utilisée, ses hypothèses, ses limites, et l&#8217;interprétation des résultats.</p>
+</div>
+<div class="paragraph">
+<p>On notera R1 le 1er tour et R2 le 2nd tour.</p>
 </div>
 </div>
 </div>
@@ -497,10 +500,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_le_problème_on_nobserve_pas_le_comportement_individuel">2. Le problème : on n&#8217;observe pas le comportement individuel</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Les données électorales françaises sont <strong>agrégées par bureau de vote</strong>. On sait que le bureau 098 a donné 148 voix à Piquemal au 1er tour et 170 voix au 2nd tour — mais on ne sait pas si ce sont les mêmes personnes. Le bulletin est secret.</p>
+<p>Les données électorales sont <strong>agrégées par bureau de vote</strong>. On observe le nombre de voix pour chaque liste dans chaque bureau, mais pas le comportement individuel des électeurs : on ne sait pas qui a voté pour qui. Par exemple, si la liste A fait 100 voix au 1er tour et 80 voix au 2nd tour, on ne peut pas conclure que 80 % des électeurs A ont voté pour le même candidat au 2nd tour. Certains peuvent être partis vers l&#8217;autre finaliste, ou s&#8217;être abstenus.</p>
 </div>
 <div class="paragraph">
-<p>Pour inférer un comportement individuel (le taux de report) à partir de données agrégées, on utilise une technique classique en sociologie électorale : la <strong>régression écologique</strong> (ou *inférence écologique*<sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>). Elle est utilisée notamment par le CEVIPOF, l&#8217;IFOP et Sciences Po pour analyser les reports entre tours.</p>
+<p>Pour inférer un comportement individuel (le taux de report) à partir de données agrégées, on utilise une technique classique en sociologie électorale : la <strong>régression écologique</strong> (ou <strong>inférence écologique</strong> <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>). Cette méthode semble être celle utilisée par le CEVIPOF ou encore l&#8217;IFOP pour analyser les reports entre tours.</p>
 </div>
 </div>
 </div>
@@ -510,19 +513,19 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sect2">
 <h3 id="_variables">3.1. Variables</h3>
 <div class="paragraph">
-<p>Pour chaque bureau de vote \(i\) (284 au total) :</p>
+<p>Pour chaque bureau de vote \(i\) (284 au total), on définit :</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>Variable dépendante</strong> : \(y_i\) = score de Piquemal au 2nd tour (en % des exprimés R2)</p>
+<p><strong>Variable dépendante</strong> : \(y_i\) = score de Piquemal au 2nd tour (en % des exprimés R2) dans le bureau de vote \(i\)</p>
 </li>
 <li>
 <p><strong>Variables explicatives</strong> :</p>
 <div class="ulist">
 <ul>
 <li>
-<p>\(x_{k,i}\) = score de la liste \(k\) au 1er tour (en % des exprimés R1), pour \(k = 0 \ldots 9\)</p>
+<p>\(x_{k,i}\) = score de la liste \(k\) au 1er tour (en % des exprimés R1) dans le bureau de vote \(i\), pour \(k = 0 \ldots 9\)</p>
 </li>
 <li>
 <p>\(\Delta\text{part}_i\) = variation de participation entre les deux tours :</p>
@@ -572,7 +575,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sect2">
 <h3 id="_équation_du_modèle">3.2. Équation du modèle</h3>
 <div class="paragraph">
-<p>Sans constante (les pourcentages des 10 listes somment à \(\approx 1\), ce qui introduit une contrainte de dépendance linéaire entre variables explicatives) :</p>
+<p>On cherche alors à résoudre l&#8217;équation suivante pour chaque bureau \(i\) :</p>
 </div>
 <div class="stemblock">
 <div class="content">
@@ -605,7 +608,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 \(\beta_k\)
 </td>
 <td class="hdlist2">
-<p>coefficient de report agrégé estimé de la liste \(k\) vers Piquemal (approximation du taux de report moyen sous hypothèse d’homogénéité)</p>
+<p>coefficient de report agrégé estimé de la liste \(k\) vers Piquemal (approximation du taux de report moyen sous hypothèse d’homogénéité). <strong>Ce sont ces valeurs là qui nous intéressent car elles permettent d’estimer la fidélité ou infidélité électorale de chaque liste au 1er tour.</strong></p>
 </td>
 </tr>
 <tr>
@@ -640,10 +643,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="ulist">
 <ul>
 <li>
-<p>\(\beta_k\) ≈ part moyenne estimée des électeurs de la liste \(k\) au R1 ayant voté Piquemal au R2 (interprétation agrégée, non individuelle)</p>
-</li>
-<li>
-<p>\(1 - \beta_k\) = part estimée ayant voté Moudenc ou s&#8217;étant abstenue</p>
+<p>\(\beta_k\) ≈ part moyenne estimée des électeurs de la liste \(k\) au R1 ayant voté Piquemal au R2 (interprétation agrégée, non individuelle !)</p>
 </li>
 <li>
 <p>\(\gamma\) = effet agrégé de la variation de participation sur le score de Piquemal (interprétation descriptive uniquement ; ne permet pas d’identifier directement le comportement individuel des nouveaux votants)</p>
@@ -654,17 +654,17 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <table>
 <tr>
 <td class="icon">
-<div class="title">Note</div>
+<i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-Les coefficients ne sont pas contraints dans l’intervalle \([0,1\)]. En présence de multicolinéarité ou de faible volume de voix, ils peuvent être négatifs ou supérieurs à 1. Ces valeurs ne doivent pas être interprétées littéralement comme des comportements individuels.
+Les coefficients ne sont pas contraints dans l’intervalle \([0,1\)]. Cela pourrait donner lieu à une étude plus approfondie intéressante même s&#8217;il y a fort à parier (intuition) que les résultats finaux soient similaires. Ils peuvent ainsi, horreur absolue, être négatifs ou supérieurs à 1. Ces valeurs ne doivent pas être interprétées littéralement.
 </td>
 </tr>
 </table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_illustration_avec_les_données_du_1er_tour_de_toulouse">3.3. Illustration avec les données du 1er tour de Toulouse</h3>
+<h3 id="_résultats_avec_les_données_du_1er_tour_à_toulouse">3.3. Résultats avec les données du 1er tour à Toulouse</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -715,35 +715,35 @@ Les coefficients ne sont pas contraints dans l’intervalle \([0,1\)]. En prése
 <td class="tableblock halign-left valign-top"><p class="tableblock">Autres (5 listes)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">4 945</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">3,1 %</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">instable (faible volume de voix et forte colinéarité : coefficients non robustes et non interprétables)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">instable (faible volume de voix : coefficients non robustes et non interprétables)</p></td>
 </tr>
 </tbody>
 </table>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Lecture des résultats</div>
+<div class="paragraph">
+<p>La ligne Briançon (PS) donne \(\beta_{\text{Briançon}} = 0{,}73\) : environ <strong>73 % des électeurs PS ont suivi la consigne de fusion vers Piquemal</strong>, soit \(39\,245 \times 0{,}73 \approx 28\,650\) voix transférées. Les 27 % restants ont voté Moudenc ou abstention.</p>
+</div>
+<div class="paragraph">
+<p>La ligne Leonardelli (RN) donne \(\beta_{\text{Leon}} \approx 0{,}00\) : <strong>la quasi-totalité des électeurs RN ont voté Moudenc au 2nd tour</strong>.</p>
+</div>
+<div class="paragraph">
+<p>La ligne Piquemal (LFI) confirme \(\beta_{\text{Piquemal}} \approx 1{,}00\) : la fusion a bien fonctionné côté LFI, avec une fidélité quasi totale à la liste d&#8217;union.</p>
+</div>
+</div>
+</div>
 <div class="admonitionblock note">
 <table>
 <tr>
 <td class="icon">
-<div class="title">Note</div>
+<i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
 Ces valeurs sont issues du modèle mono-output en pourcentages (variable dépendante = score Piquemal R2 en % des exprimés), utilisé ici à des fins d&#8217;illustration. L&#8217;estimation finale (§ Résultats de la régression) repose sur un modèle multi-output en volumes absolus avec trois équations simultanées (Moudenc, Piquemal, non-votants), ce qui explique des coefficients légèrement différents (ex. \(\beta_{\text{Briançon}}^P = 0{,}674\) au lieu de \(0{,}73\)).
 </td>
 </tr>
 </table>
-</div>
-<div class="sidebarblock">
-<div class="content">
-<div class="title">Lecture des résultats</div>
-<div class="paragraph">
-<p>La ligne Briançon (PS) donne \(\beta_{\text{Briançon}} = 0{,}73\) : environ <strong>73 % des électeurs PS ont suivi la consigne de fusion vers Piquemal</strong>, soit \(39\,245 \times 0{,}73 \approx 28\,650\) voix transférées. Les 27 % restants ont voté Moudenc.</p>
-</div>
-<div class="paragraph">
-<p>La ligne Leonardelli (RN) donne \(\beta_{\text{Leon}} \approx 0{,}00\) : <strong>la quasi-totalité des électeurs RN ont voté Moudenc au 2nd tour</strong> — résultat cohérent avec le profil droite/centre-droit de cet électorat.</p>
-</div>
-<div class="paragraph">
-<p>La ligne Piquemal (LFI) confirme \(\beta_{\text{Piquemal}} \approx 1{,}00\) : la fusion a bien fonctionné côté LFI, avec une fidélité quasi totale à la liste d&#8217;union.</p>
-</div>
-</div>
 </div>
 </div>
 </div>
@@ -755,28 +755,12 @@ Ces valeurs sont issues du modèle mono-output en pourcentages (variable dépend
 <p>Briançon (PS) et Piquemal (LFI) <strong>ont fusionné avant le second tour</strong>. Leurs électeurs du 1er tour ont reçu une consigne de vote explicite.</p>
 </div>
 <div class="paragraph">
-<p>Le modèle confirme que la fusion a fonctionné côté LFI : \(\beta_{\text{Piquemal}} \approx 1{,}00\). En revanche, côté PS, la fusion est <strong>partielle</strong> : \(\beta_{\text{Briançon}} = 0{,}73\), soit un taux de fuite de 27 % vers Moudenc. Ce résultat est analytiquement intéressant — il quantifie le coût électoral de la consigne de fusion pour le PS.</p>
-</div>
-<div class="paragraph">
-<p>L&#8217;intérêt de contrôler ces listes « connues » est double :</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p><strong>Mesurer précisément le taux de fuite</strong> (ici 27 % chez Briançon, quasi nul chez Piquemal)</p>
-</li>
-<li>
-<p><strong>Isoler le report des listes incertaines</strong> (RN, petites listes) en neutralisant la colinéarité avec les listes fusionnées</p>
-</li>
-</ol>
-</div>
-<div class="paragraph">
-<p>\(\beta_{\text{Moudenc}} \approx 0{,}00\) confirme la quasi-fidélité totale de l&#8217;électorat Moudenc R1 au R2.</p>
+<p>Le modèle confirme que la fusion a fonctionné côté LFI : \(\beta_{\text{Piquemal}} \approx 1{,}00\). En revanche, côté PS, la fusion est <strong>partielle</strong> : \(\beta_{\text{Briançon}} = 0{,}73\), soit un taux de fuite de 27 % vers Moudenc ou absentention. Ce résultat est analytiquement intéressant car il quantifie le coût électoral de la consigne de fusion pour le PS.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_pourquoi_la_régression_linéaire_multivariée_mco">5. Pourquoi la régression linéaire multivariée (MCO) ?</h2>
+<h2 id="_mais_quest_ce_quune_régression_linéaire_multivariée_mco">5. Mais qu&#8217;est ce qu&#8217;une régression linéaire multivariée (MCO) ?</h2>
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_exemple_introductif">5.1. Exemple introductif</h3>
@@ -787,10 +771,10 @@ Ces valeurs sont issues du modèle mono-output en pourcentages (variable dépend
 <table>
 <tr>
 <td class="icon">
-<div class="title">Note</div>
+<i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-Les données de la colonne « A (2nd tour) » ont été construites à partir de coefficients choisis à l&#8217;avance (\(\beta_A = 0{,}90\), \(\beta_B = 0{,}10\), \(\beta_C = 0{,}60\)). Les MCO retrouvent donc ces coefficients exactement, avec des résidus nuls. C&#8217;est un choix pédagogique pour rendre le calcul vérifiable à la main — sur des données réelles, les résidus ne sont jamais nuls.
+Les données de la colonne « A (2nd tour) » ont été construites à partir de coefficients choisis à l&#8217;avance (\(\beta_A = 0{,}90\), \(\beta_B = 0{,}10\), \(\beta_C = 0{,}60\)). Donc dans ce cas, cela tombe en marche ! Les MCO retrouvent donc ces coefficients exactement, avec des résidus nuls (ce qui n&#8217;arrive jamais) C&#8217;est un choix pédagogique pour rendre le calcul vérifiable à la main. Sur des données réelles, les résidus ne sont jamais nuls.
 </td>
 </tr>
 </table>
@@ -926,7 +910,7 @@ Les données de la colonne « A (2nd tour) » ont été construites à partir de
 <table>
 <tr>
 <td class="icon">
-<div class="title">Tip</div>
+<i class="fa icon-tip" title="Tip"></i>
 </td>
 <td class="content">
 <div class="paragraph">
@@ -934,9 +918,6 @@ Les données de la colonne « A (2nd tour) » ont été construites à partir de
 </div>
 <div class="paragraph">
 <p>Un système d&#8217;équations est dit <strong>sur-déterminé</strong> lorsqu&#8217;il y a <strong>plus d&#8217;équations que d&#8217;inconnues</strong> (\(n &gt; p\)). Ici, chaque bureau de vote génère une équation, et les inconnues sont les taux de report \(\beta_k\).</p>
-</div>
-<div class="paragraph">
-<p>Avec \(n = 3\) bureaux et \(p = 3\) inconnues (exemple ci-dessus), le système est carré : il existe une unique solution exacte, et les résidus sont nuls.</p>
 </div>
 <div class="paragraph">
 <p>Avec \(n = 284\) bureaux et \(p = 11\) inconnues (cas réel), il y a 284 équations pour 11 inconnues. Sauf si les données sont parfaitement cohérentes — ce qui ne se produit jamais sur des données réelles en raison du bruit électoral —, il n&#8217;existe aucune solution exacte. Les MCO trouvent alors le vecteur \(\hat{\boldsymbol{\beta}}\) qui minimise la somme des carrés des résidus \(\sum_i \varepsilon_i^2\), c&#8217;est-à-dire la solution « la moins mauvaise » au sens de l&#8217;erreur quadratique.</p>
@@ -967,10 +948,10 @@ Les données de la colonne « A (2nd tour) » ont été construites à partir de
 <table>
 <tr>
 <td class="icon">
-<div class="title">Note</div>
+<i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-Cette expression suppose que la matrice \(\mathbf{X}^\top \mathbf{X}\) est inversible (rang plein). En pratique, les solveurs numériques utilisent une pseudo-inverse ou une décomposition QR lorsque cette condition n’est pas strictement vérifiée.
+Cette expression suppose que la matrice \(\mathbf{X}^\top \mathbf{X}\) est inversible. En pratique, les solveurs numériques utilisent une pseudo-inverse ou une décomposition lorsque cette condition n’est pas vérifiée.
 </td>
 </tr>
 </table>
@@ -1018,10 +999,10 @@ Cette expression suppose que la matrice \(\mathbf{X}^\top \mathbf{X}\) est inver
 <table>
 <tr>
 <td class="icon">
-<div class="title">Note</div>
+<i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-Les résidus sont nuls ici parce que les données fictives ont été <strong>construites</strong> à partir des coefficients exacts — \(y_i\) est calculé directement comme \(0{,}90 \cdot a_i + 0{,}10 \cdot b_i + 0{,}60 \cdot c_i\), sans bruit. Sur des données réelles, le comportement électoral varie d&#8217;un bureau à l&#8217;autre (profils sociologiques différents, dynamiques locales) et le modèle linéaire n&#8217;est qu&#8217;une approximation : les résidus sont alors non nuls, et le \(R^2 &lt; 1\).
+Les résidus sont nuls ici parce que les données fictives ont été <strong>construites</strong> sans bruit. Sur des données réelles, le comportement électoral varie d&#8217;un bureau à l&#8217;autre (profils sociologiques différents, dynamiques locales) et le modèle linéaire n&#8217;est qu&#8217;une approximation : les résidus sont alors non nuls, et le \(R^2 &lt; 1\).
 </td>
 </tr>
 </table>
@@ -1030,7 +1011,7 @@ Les résidus sont nuls ici parce que les données fictives ont été <strong>con
 <div class="sect2">
 <h3 id="_exemple_avec_résidus_non_nuls">5.2. Exemple avec résidus non nuls</h3>
 <div class="paragraph">
-<p>On reprend le même cadre mais avec <strong>4 bureaux</strong> et des données de vote qui ne vérifient plus exactement le modèle linéaire. Le système est sur-déterminé (4 équations, 3 inconnues) : il n&#8217;existe aucun \(\boldsymbol{\beta}\) qui annule tous les résidus.</p>
+<p>On reprend le même cadre mais avec <strong>4 bureaux</strong> et des données de vote qui ne vérifient plus exactement le modèle linéaire. Le système est sur-déterminé (4 équations, 3 inconnues).</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <caption class="title">Table 2. Données fictives avec bruit (nombres de voix)</caption>
@@ -1092,36 +1073,7 @@ Les résidus sont nuls ici parce que les données fictives ont été <strong>con
 </div>
 </div>
 <div class="paragraph">
-<p>Le code Python suivant réalise l&#8217;estimation :</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-python" data-lang="python">import numpy as np
-
-X = np.array([[100, 60, 80],
-              [50, 100, 40],
-              [120, 40, 60],
-              [70, 80, 90]], dtype=float)
-
-y = np.array([147, 82, 145, 128], dtype=float)
-
-# Résolution par MCO (équation normale)
-beta, _, _, _ = np.linalg.lstsq(X, y, rcond=None)
-
-y_hat     = X @ beta
-residuals = y - y_hat
-
-print("β̂ =", np.round(beta, 3))       # [0.842, 0.133, 0.661]
-print("ŷ =", np.round(y_hat, 1))       # [145.1, 81.9, 146.0, 129.1]
-print("ε =", np.round(residuals, 1))   # [1.9, 0.1, -1.0, -1.1]
-
-ss_res = np.sum(residuals**2)
-ss_tot = np.sum((y - y.mean())**2)
-print("R² =", round(1 - ss_res / ss_tot, 4))  # 0.9978</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>L&#8217;équivalent en R :</p>
+<p>Le code R suivant réalise l&#8217;estimation :</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1133,12 +1085,13 @@ print("R² =", round(1 - ss_res / ss_tot, 4))  # 0.9978</code></pre>
 y &lt;- c(147, 82, 145, 128)
 
 # Régression sans constante (- 1)
+# On contraint le modèle à passer par l'origine : sans voix au 1er tour, il n'y a pas de voix au 2nd tour !
 modele &lt;- lm(y ~ X - 1)
 
-print(round(coef(modele), 3))        # XA=0.842  XB=0.133  XC=0.661
+print(round(coef(modele), 3))        # XA=0.842  XB=0.133  XC=0.661 Les reports agrégés estimés !
 print(round(fitted(modele), 1))      # 145.1  81.9  146.0  129.1
 print(round(residuals(modele), 1))   #   1.9   0.1   -1.0   -1.1
-print(round(summary(modele)$r.squared, 4))  # 0.9978</code></pre>
+print(round(summary(modele)$r.squared, 4))  # 0.99</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1154,6 +1107,27 @@ print(round(summary(modele)$r.squared, 4))  # 0.9978</code></pre>
 <div class="stemblock">
 <div class="content">
 \[\hat{\boldsymbol{\beta}} = \begin{pmatrix} 0{,}842 \\ 0{,}133 \\ 0{,}661 \end{pmatrix}\]
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Lecture</div>
+<div class="ulist">
+<ul>
+<li>
+<p>\(\hat\beta_A = 0{,}842\) : 84 % de fidélité estimée des électeurs A (contre 90 % dans l&#8217;exemple sans bruit)</p>
+</li>
+<li>
+<p>\(\hat\beta_B = 0{,}133\) : 13 % des électeurs B se sont reportés sur A</p>
+</li>
+<li>
+<p>\(\hat\beta_C = 0{,}661\) : 66 % des électeurs de la liste C ont voté A</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Les coefficients estimés correspondent à la meilleure approximation linéaire (au sens des moindres carrés) des voix du second tour à partir des résultats du premier tour. C&#8217;est un abus de langage de parler de « taux de report » au sens strict, car les coefficients ne sont pas contraints à être des proportions entre 0 et 1. Ils doivent être interprétés comme des flux agrégés, avec une part de résidu (comportements non captés par le modèle) qui peut être négative ou positive&#8230;&#8203;</p>
+</div>
 </div>
 </div>
 <div class="paragraph">
@@ -1202,38 +1176,17 @@ print(round(summary(modele)$r.squared, 4))  # 0.9978</code></pre>
 </tbody>
 </table>
 <div class="paragraph">
-<p>Le \(R^2 = 0{,}998\) : le modèle explique 99,8 % de la variance des voix A au 2nd tour. Les résidus sont faibles mais non nuls — les MCO ont trouvé la solution qui minimise \(\sum_i \varepsilon_i^2 = 1{,}9^2 + 0{,}1^2 + 1{,}0^2 + 1{,}1^2 \approx 5{,}8\).</p>
-</div>
-<div class="sidebarblock">
-<div class="content">
-<div class="title">Lecture</div>
-<div class="ulist">
-<ul>
-<li>
-<p>\(\hat\beta_A = 0{,}842\) : 84 % de fidélité estimée des électeurs A (contre 90 % dans l&#8217;exemple sans bruit)</p>
-</li>
-<li>
-<p>\(\hat\beta_B = 0{,}133\) : 13 % des électeurs B se sont reportés sur A</p>
-</li>
-<li>
-<p>\(\hat\beta_C = 0{,}661\) : 66 % des électeurs éliminés (liste C) ont voté A</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>Les coefficients s&#8217;écartent légèrement des valeurs « vraies » (0,90 ; 0,10 ; 0,60) : le bruit dans les données introduit une imprécision d&#8217;estimation, inévitable sur des données réelles.</p>
-</div>
-</div>
+<p>Le \(R^2 = 0{,}998\) : le modèle explique 99,8 % de la variance des voix A au 2nd tour. Les résidus sont faibles mais non nuls. Les MCO ont trouvé la solution qui minimise \(\sum_i \varepsilon_i^2 = 1{,}9^2 + 0{,}1^2 + 1{,}0^2 + 1{,}1^2 \approx 5{,}8\).</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_estimation_par_mco">5.3. Estimation par MCO</h3>
+<h3 id="_estimation_par_mco_avec_les_données_réelles_formulation_multi_output">5.3. Estimation par MCO avec les données réelles : formulation multi-output</h3>
 <div class="paragraph">
-<p>L&#8217;estimateur des Moindres Carrés Ordinaires minimise la somme des carrés des résidus :</p>
+<p>On cherche les coefficients du vecteur \(\beta\) de façon à rendre les erreurs les plus petites possibles, au sens de la somme des carrés. C&#8217;est-à-dire que l&#8217;on cherche à minimiser l&#8217;expression suivante :</p>
 </div>
 <div class="stemblock">
 <div class="content">
-\[\hat{\boldsymbol{\beta}} = \underset{\boldsymbol{\beta}}{\arg\min} \sum_{i=1}^{n} \left( y_i - \mathbf{x}_i^\top \boldsymbol{\beta} \right)^2\]
+\[\sum_{i=1}^{n} \left( y_i - \mathbf{x}_i^\top \boldsymbol{\beta} \right)^2\]
 </div>
 </div>
 <div class="paragraph">
@@ -1254,7 +1207,7 @@ print(round(summary(modele)$r.squared, 4))  # 0.9978</code></pre>
 \(\mathbf{x}_i\)
 </td>
 <td class="hdlist2">
-<p>vecteur ligne des \(11\) variables explicatives du bureau \(i\)</p>
+<p>vecteur ligne des \(11\) variables explicatives</p>
 </td>
 </tr>
 <tr>
@@ -1301,7 +1254,7 @@ print(round(summary(modele)$r.squared, 4))  # 0.9978</code></pre>
 \(\mathbf{X}^\top \mathbf{X}\)
 </td>
 <td class="hdlist2">
-<p>matrice de Gram \(11 \times 11\) (inversible si les colonnes de \(\mathbf{X}\) sont linéairement indépendantes)</p>
+<p>matrice \(11 \times 11\) (inversible si les colonnes de \(\mathbf{X}\) sont linéairement indépendantes)</p>
 </td>
 </tr>
 <tr>
@@ -1318,108 +1271,16 @@ print(round(summary(modele)$r.squared, 4))  # 0.9978</code></pre>
 <p>Avec 284 bureaux et 11 variables, le ratio observations/variables est \(\approx 26\), ce qui garantit une estimation robuste.</p>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_résolution_numérique_élimination_de_gauss">5.4. Résolution numérique : élimination de Gauss</h3>
-<div class="paragraph">
-<p>Le système \(\left(\mathbf{X}^\top \mathbf{X}\right)\boldsymbol{\beta} = \mathbf{X}^\top \mathbf{y}\) est résolu par <strong>élimination gaussienne avec pivot partiel</strong> sur la matrice augmentée \(11 \times 12\). Cette méthode est stable numériquement pour des petits systèmes denses.</p>
-</div>
-</div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_qualité_du_modèle_le_coefficient_de_détermination_r">6. Qualité du modèle : le coefficient de détermination R²</h2>
-<div class="sectionbody">
-<div class="stemblock">
-<div class="content">
-\[R^2 = 1 - \frac{\sum_{i}(y_i - \hat{y}_i)^2}{\sum_{i}(y_i - \bar{y})^2}\]
-</div>
-</div>
-<div class="paragraph">
-<p>avec :</p>
-</div>
-<div class="hdlist">
-<table>
-<tr>
-<td class="hdlist1">
-\(y_i\)
-</td>
-<td class="hdlist2">
-<p>score Piquemal R2 observé dans le bureau \(i\)</p>
-</td>
-</tr>
-<tr>
-<td class="hdlist1">
-\(\hat{y}_i\)
-</td>
-<td class="hdlist2">
-<p>score Piquemal R2 prédit par le modèle : \(\hat{y}_i = \mathbf{x}_i^\top \hat{\boldsymbol{\beta}}\)</p>
-</td>
-</tr>
-<tr>
-<td class="hdlist1">
-\(\bar{y}\)
-</td>
-<td class="hdlist2">
-<p>moyenne des scores Piquemal R2 sur l&#8217;ensemble des bureaux</p>
-</td>
-</tr>
-<tr>
-<td class="hdlist1">
-\(\sum_i(y_i - \hat{y}_i)^2\)
-</td>
-<td class="hdlist2">
-<p>somme des carrés des résidus (variance non expliquée)</p>
-</td>
-</tr>
-<tr>
-<td class="hdlist1">
-\(\sum_i(y_i - \bar{y})^2\)
-</td>
-<td class="hdlist2">
-<p>somme des carrés totale (variance totale)</p>
-</td>
-</tr>
-</table>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 66.6667%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Valeur de \(R^2\)</th>
-<th class="tableblock halign-left valign-top">Interprétation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">\(&gt; 0{,}90\)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Modèle excellent — la géographie du 1er tour prédit très bien le 2nd tour</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">\(\in [0{,}75\,;\,0{,}90]\)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Bon — quelques effets locaux non captés</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">\(&lt; 0{,}75\)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">La géographie a fortement évolué entre les tours (inhabituel)</p></td>
-</tr>
-</tbody>
-</table>
-<div class="paragraph">
-<p>En France, les régressions écologiques inter-tours atteignent typiquement \(R^2 \approx 0{,}92\text{–}0{,}97\) pour les élections municipales.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_résultats_de_la_régression_données_réelles_2026">7. Résultats de la régression — données réelles 2026</h2>
+<h2 id="_résultats_de_la_régression_données_réelles_2026">6. Résultats de la régression — données réelles 2026</h2>
 <div class="sectionbody">
 <div class="admonitionblock note">
 <table>
 <tr>
 <td class="icon">
-<div class="title">Note</div>
+<i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
 Contrairement à la formulation initiale en pourcentages, l’estimation finale est réalisée sur les volumes de voix absolus. Les coefficients doivent donc être interprétés comme des flux agrégés et non comme des proportions strictes.
@@ -1428,13 +1289,13 @@ Contrairement à la formulation initiale en pourcentages, l’estimation finale 
 </table>
 </div>
 <div class="sect2">
-<h3 id="_mise_en_œuvre">7.1. Mise en œuvre</h3>
+<h3 id="_mise_en_œuvre">6.1. Mise en œuvre</h3>
 <div class="paragraph">
 <p>Le modèle a été estimé sur les 284 bureaux de vote de Toulouse (\(n = 284\), \(p = 11\) variables). Les variables explicatives sont les <strong>volumes de voix absolus</strong> au R1 (10 listes + non-votants R1). Le terme « non-votants R1 » joue un rôle analogue à \(\Delta\text{part}_i\) dans la formulation en pourcentages : il permet de capter la mobilisation différentielle entre les deux tours, en attribuant un coefficient aux électeurs qui n&#8217;avaient pas voté au 1er tour. Les variables dépendantes sont les volumes au R2 : voix Moudenc, voix Piquemal, non-votants R2. L&#8217;estimation est réalisée par <code>numpy.linalg.lstsq</code> (MCO sans constante, formulation multi-output).</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_coefficients_estimés">7.2. Coefficients estimés</h3>
+<h3 id="_coefficients_estimés">6.2. Coefficients estimés</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -1457,8 +1318,8 @@ Contrairement à la formulation initiale en pourcentages, l’estimation finale 
 <td class="tableblock halign-left valign-top"><p class="tableblock">Briançon (PS)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">25 %</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">67 %</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">−1 %</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">91 %</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0 %</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">92 %</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Moudenc (DVD)</p></td>
@@ -1478,15 +1339,15 @@ Contrairement à la formulation initiale en pourcentages, l’estimation finale 
 <td class="tableblock halign-left valign-top"><p class="tableblock">Leonardelli (RN)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">112 %</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">−26 %</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">+16 %</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">+17 %</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">103 %</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Meilhac</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">81 %</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">9 %</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">+5 %</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">94 %</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">+3 %</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">93 %</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Scalli</p></td>
@@ -1536,19 +1397,69 @@ Contrairement à la formulation initiale en pourcentages, l’estimation finale 
 <table>
 <tr>
 <td class="icon">
-<div class="title">Note</div>
+<i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-Les trois équations (Moudenc, Piquemal, abstention) sont estimées indépendamment sans contrainte de somme. Les coefficients peuvent donc ne pas totaliser 100 %, ce qui reflète une absence de contrainte de conservation des flux dans le modèle.
+Les trois équations (Moudenc, Piquemal, abstention) sont estimées indépendamment sans contrainte de somme. Les coefficients peuvent donc ne pas totaliser 100 % (horreur), ce qui reflète une absence de contrainte de conservation des flux dans le modèle. Encore un fois, on peut refaire une étude analogue avec cette contrainte mais, intuition, les résultats finaux seraient similaires.
 </td>
 </tr>
 </table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_diagramme_de_sankey_des_reports_estimés">7.3. Diagramme de Sankey des reports estimés</h3>
+<h3 id="_reproduire_lestimation">6.3. Reproduire l&#8217;estimation</h3>
 <div class="paragraph">
-<p>Représentation visuelle des flux de voix estimés par le modèle. La largeur de chaque ruban est proportionnelle au volume de voix transférées. Les coefficients hors [0, 1] sont contraints pour la représentation : valeurs négatives ramenées à 0, sommes supérieures à 1 normalisées, résidu affecté à l&#8217;abstention. Les listes en gris ont des coefficients instables (faible volume de voix).</p>
+<p>Les données et le code sont disponibles pour reproduire l&#8217;estimation :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="X_bureaux_R1.csv">X_bureaux_R1.csv</a> — matrice des variables explicatives (284 bureaux × 11 colonnes : voix R1 par liste + non-votants R1)</p>
+</li>
+<li>
+<p><a href="Y_bureaux_R2.csv">Y_bureaux_R2.csv</a> — matrice des variables dépendantes (284 bureaux × 3 colonnes : voix Moudenc, Piquemal, non-votants R2)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Le script R suivant reproduit l&#8217;estimation à partir de ces deux fichiers :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-r" data-lang="r">#!/usr/bin/env Rscript
+# MCO-elections-toulouse.R
+# Régression écologique MCO multi-output — Toulouse Municipales 2026
+#
+# Usage : Rscript notes/MCO-elections-toulouse.R   (depuis la racine du dépôt)
+#         Rscript MCO-elections-toulouse.R         (depuis notes/)
+
+# ── Lire les données ──────────────────────────────────────────────────────────
+# X : variables explicatives — voix R1 par liste + non-votants R1 (284 bureaux × 11 colonnes)
+# Y : variables dépendantes  — voix R2 Moudenc, Piquemal, non-votants  (284 bureaux × 3 colonnes)
+X &lt;- as.matrix(read.csv("notes/X_bureaux_R1.csv", row.names = 1)[, -1])
+Y &lt;- as.matrix(read.csv("notes/Y_bureaux_R2.csv", row.names = 1)[, -1])
+
+# ── Régression MCO sans constante ─────────────────────────────────────────────
+# Le -1 supprime l'ordonnée à l'origine (équivalent de numpy.linalg.lstsq)
+# Y peut avoir plusieurs colonnes : lm() estime une équation par colonne
+fit &lt;- lm(Y ~ X - 1)
+
+# ── Résultats : coefficients en pourcentages ──────────────────────────────────
+# coef(fit) renvoie une matrice (11 variables × 3 équations)
+# On multiplie par 100 pour lire des pourcentages de report
+beta &lt;- coef(fit)
+rownames(beta) &lt;- colnames(X)   # lm() préfixe "X" automatiquement, on corrige
+print(round(beta * 100, 1))</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_diagramme_de_sankey_des_reports_estimés">6.4. Diagramme de Sankey des reports estimés</h3>
+<div class="paragraph">
+<p>Terminons, par un joli diagramme de Sankey pour visualiser les flux de voix estimés par le modèle. Chaque ruban représente un flux de voix d&#8217;une liste du 1er tour vers un finaliste du 2nd tour ou vers l&#8217;abstention. La largeur de chaque ruban est proportionnelle au volume de voix transférées.</p>
+</div>
+<div class="paragraph">
+<p>Les coefficients hors [0, 1] sont contraints pour la représentation : valeurs négatives ramenées à 0, sommes supérieures à 1 normalisées, résidu affecté à l&#8217;abstention. Les listes en gris ont des coefficients instables (faible volume de voix).</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
@@ -1557,12 +1468,12 @@ Les trois équations (Moudenc, Piquemal, abstention) sont estimées indépendamm
 </div>
 </div>
 <div class="sect2">
-<h3 id="_de_la_régression_aux_27_calcul_détaillé">7.4. De la régression aux 27 % : calcul détaillé</h3>
+<h3 id="_de_la_régression_aux_27_calcul_détaillé">6.5. De la régression aux 27 % : calcul détaillé</h3>
 <div class="paragraph">
-<p>Le chiffre "27 % des électeurs Briançon ont voté Moudenc" est la valeur la plus commentée de l&#8217;analyse. Voici comment on y arrive pas à pas.</p>
+<p>Le chiffre "27 % des électeurs Briançon ont voté Moudenc" est la valeur clé de l&#8217;analyse. Voici comment on y arrive pas à pas.</p>
 </div>
 <div class="sect3">
-<h4 id="_étape_1_lire_les_deux_coefficients_bruts">7.4.1. Étape 1 — lire les deux coefficients bruts</h4>
+<h4 id="_étape_1_lire_les_deux_coefficients_bruts">6.5.1. Étape 1 — lire les deux coefficients bruts</h4>
 <div class="paragraph">
 <p>Au second tour, chaque électeur du 1er tour fait face à exactement <strong>trois issues possibles</strong> : voter Moudenc, voter Piquemal, ou ne pas voter (abstention, blanc, nul). Pour couvrir les trois issues — et notamment estimer le comportement des nouveaux votants entre les deux tours — le modèle estime <strong>simultanément</strong> trois régressions sur les 284 bureaux, avec les mêmes 11 variables explicatives :</p>
 </div>
@@ -1608,7 +1519,7 @@ Les trois équations (Moudenc, Piquemal, abstention) sont estimées indépendamm
 </div>
 </div>
 <div class="sect3">
-<h4 id="_étape_2_convertir_en_voix_absolues">7.4.2. Étape 2 — convertir en voix absolues</h4>
+<h4 id="_étape_2_convertir_en_voix_absolues">6.5.2. Étape 2 — convertir en voix absolues</h4>
 <div class="paragraph">
 <p>Briançon a obtenu <strong>39 245 voix</strong> au 1er tour. On applique les coefficients :</p>
 </div>
@@ -1624,7 +1535,7 @@ Les trois équations (Moudenc, Piquemal, abstention) sont estimées indépendamm
 </div>
 </div>
 <div class="sect3">
-<h4 id="_étape_3_normaliser_pour_obtenir_un_pourcentage_entre_finalistes">7.4.3. Étape 3 — normaliser pour obtenir un pourcentage entre finalistes</h4>
+<h4 id="_étape_3_normaliser_pour_obtenir_un_pourcentage_entre_finalistes">6.5.3. Étape 3 — normaliser pour obtenir un pourcentage entre finalistes</h4>
 <div class="paragraph">
 <p>Les deux coefficients bruts ne somment pas à 1 (ils somment à \(0{,}247 + 0{,}674 = 0{,}921\)). Pour exprimer la part de chaque finaliste <strong>parmi ceux des électeurs Briançon qui ont effectivement voté au 2nd tour</strong>, on normalise :</p>
 </div>
@@ -1642,7 +1553,7 @@ Les trois équations (Moudenc, Piquemal, abstention) sont estimées indépendamm
 <table>
 <tr>
 <td class="icon">
-<div class="title">Note</div>
+<i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
 Le 27 % affiché dans l&#8217;application est cette valeur normalisée — c&#8217;est la part des électeurs Briançon ayant voté au 2nd tour qui ont choisi Moudenc. Les \(1 - 0{,}247 - 0{,}674 = 0{,}079 \approx 8\,\%\) restants représentent la part non ventilée entre les deux finalistes — résidu du modèle et comportements non captés (blancs, nuls, variation d&#8217;abstention). Ce résidu ne doit pas être interprété comme un flux identifié vers l&#8217;abstention.
@@ -1652,7 +1563,7 @@ Le 27 % affiché dans l&#8217;application est cette valeur normalisée — c&#82
 </div>
 </div>
 <div class="sect3">
-<h4 id="_résumé_visuel">7.4.4. Résumé visuel</h4>
+<h4 id="_résumé_visuel">6.5.4. Résumé visuel</h4>
 <div class="stemblock">
 <div class="content">
 \[\underbrace{39\,245}_{\text{voix Briançon R1}} \longrightarrow
@@ -1666,7 +1577,7 @@ Le 27 % affiché dans l&#8217;application est cette valeur normalisée — c&#82
 </div>
 </div>
 <div class="sect2">
-<h3 id="_qualité_dajustement">7.5. Qualité d&#8217;ajustement</h3>
+<h3 id="_qualité_dajustement">6.6. Qualité d&#8217;ajustement</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -1681,15 +1592,15 @@ Le 27 % affiché dans l&#8217;application est cette valeur normalisée — c&#82
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Voix Moudenc (2nd tour)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0,987</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0,9984</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Voix Piquemal (2nd tour)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0,984</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0,9982</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Non-votants (2nd tour)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0,986</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0,9988</p></td>
 </tr>
 </tbody>
 </table>
@@ -1700,7 +1611,7 @@ Le 27 % affiché dans l&#8217;application est cette valeur normalisée — c&#82
 <table>
 <tr>
 <td class="icon">
-<div class="title">Note</div>
+<i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
 Dans les régressions écologiques inter-tours, des valeurs élevées de \(R^2\) sont en partie mécaniques (forte corrélation géographique entre tours) et ne garantissent pas à elles seules la validité des coefficients de report.
@@ -1710,7 +1621,7 @@ Dans les régressions écologiques inter-tours, des valeurs élevées de \(R^2\)
 </div>
 </div>
 <div class="sect2">
-<h3 id="_interprétation">7.6. Interprétation</h3>
+<h3 id="_interprétation">6.7. Interprétation</h3>
 <div class="hdlist">
 <table>
 <tr>
@@ -1773,7 +1684,7 @@ Petites listes
 </div>
 </div>
 <div class="sect2">
-<h3 id="_utilisation_dans_le_simulateur">7.7. Utilisation dans le simulateur</h3>
+<h3 id="_utilisation_dans_le_simulateur">6.8. Utilisation dans le simulateur</h3>
 <div class="paragraph">
 <p>Les coefficients des listes robustes (Briançon, Moudenc, Piquemal, Leonardelli, Meilhac) sont utilisés comme <strong>valeurs par défaut des curseurs</strong> du simulateur de report intégré à la carte. Les petites listes conservent une valeur par défaut de 50 %.</p>
 </div>
@@ -1781,7 +1692,7 @@ Petites listes
 </div>
 </div>
 <div class="sect1">
-<h2 id="_limite_fondamentale_linférence_écologique">8. Limite fondamentale : l&#8217;inférence écologique</h2>
+<h2 id="_limite_fondamentale_linférence_écologique">7. Limite fondamentale : l&#8217;inférence écologique</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>L'<strong>ecological fallacy</strong> (paradoxe de Robinson, 1950) désigne l&#8217;erreur qui consiste à inférer un comportement individuel à partir de corrélations agrégées.</p>
@@ -1801,10 +1712,10 @@ Petites listes
 </div>
 </div>
 <div class="sect1">
-<h2 id="_données_de_référence">9. Données de référence</h2>
+<h2 id="_données_de_référence">8. Données de référence</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_résultats_du_1er_tour_15_mars_2026">9.1. Résultats du 1er tour — 15 mars 2026</h3>
+<h3 id="_résultats_du_1er_tour_15_mars_2026">8.1. Résultats du 1er tour — 15 mars 2026</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1886,7 +1797,7 @@ Petites listes
 </table>
 </div>
 <div class="sect2">
-<h3 id="_résultats_du_2nd_tour_22_mars_2026">9.2. Résultats du 2nd tour — 22 mars 2026</h3>
+<h3 id="_résultats_du_2nd_tour_22_mars_2026">8.2. Résultats du 2nd tour — 22 mars 2026</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1938,7 +1849,7 @@ La participation a progressé de +6,1 points par rapport au 1er tour (56,5 % →
 </div>
 </div>
 <div class="sect1">
-<h2 id="_références">10. Références</h2>
+<h2 id="_références">9. Références</h2>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
@@ -1959,12 +1870,12 @@ La participation a progressé de +6,1 points par rapport au 1er tour (56,5 % →
 <div id="footnotes">
 <hr>
 <div class="footnote" id="_footnotedef_1">
-<a href="#_footnoteref_1">1</a>. Voir la définition détaillée sur Wikipédia : <a href="https://fr.wikipedia.org/wiki/Inf%C3%A9rence_%C3%A9cologique" class="bare">https://fr.wikipedia.org/wiki/Inf%C3%A9rence_%C3%A9cologique</a>
+<a href="#_footnoteref_1">1</a>. Voir la définition Wikipédia : <a href="https://fr.wikipedia.org/wiki/Inf%C3%A9rence_%C3%A9cologique" class="bare">https://fr.wikipedia.org/wiki/Inf%C3%A9rence_%C3%A9cologique</a>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-03-23 19:38:32 +0100
+Last updated 2026-03-24 20:39:36 +0100
 </div>
 </div>
 <script type="text/x-mathjax-config">
