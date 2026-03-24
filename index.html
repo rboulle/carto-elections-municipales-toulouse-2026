@@ -1250,14 +1250,32 @@
     }
 
     .ols-notes-link {
-      display: inline-block;
-      margin-top: 14px;
+      display: block;
+      margin-top: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      text-decoration: none;
+      color: inherit;
+    }
+    .ols-notes-link:hover { background: rgba(100,120,180,0.07); }
+    .ols-notes-link-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 5px;
+    }
+    .ols-notes-link-body {
+      font-size: 11px;
+      color: var(--text-secondary, #666);
+      line-height: 1.5;
+      margin-bottom: 6px;
+    }
+    .ols-notes-link-cta {
       font-size: 11px;
       color: var(--accent);
-      text-decoration: none;
-      letter-spacing: 0.02em;
+      font-weight: 500;
     }
-    .ols-notes-link:hover { text-decoration: underline; }
 
     .ols-note {
       font-size: 10px;
@@ -1528,7 +1546,11 @@
           </tbody>
         </table>
         <div class="ols-note">* Coefficients MCO &gt; 1 pour ces listes (artefact statistique sans contrainte) — interprétés comme fidélité quasi-totale. Seuls Briançon et Meilhac ont des coefficients dans [0, 1] permettant une estimation en voix.</div>
-        <a href="notes/methode-ols.html" target="_blank" class="ols-notes-link">Notes méthodologiques →</a>
+        <a href="notes/methode-ols.html" target="_blank" class="ols-notes-link">
+          <div class="ols-notes-link-title">📄 Note méthodologique complète</div>
+          <div class="ols-notes-link-body">Comment estimer les reports de voix entre deux tours à partir des résultats agrégés par bureau&nbsp;? Régression écologique MCO, hypothèses, limites, données sources et code R pour reproduire l'analyse.</div>
+          <div class="ols-notes-link-cta">Lire la note →</div>
+        </a>
       </div>
 
       <!-- Surplus -->
