@@ -14,6 +14,7 @@
 #
 # Usage : Rscript notes/MCO-elections-toulouse-contraint.R   (depuis la racine)
 
+library(tidyverse)
 library(quadprog)  # install.packages("quadprog") si nécessaire
 
 
@@ -21,25 +22,31 @@ library(quadprog)  # install.packages("quadprog") si nécessaire
 
 # X : 284 bureaux × 11 colonnes — voix obtenues par chaque liste au R1
 #                                  + nombre de non-votants au R1
-X <- as.matrix(read.csv("notes/X_bureaux_R1.csv", row.names = 1)[, -1])
+# Y : 284 bureaux × 3 colonnes  — voix Moudenc, Piquemal, non-votants au R2
 
-# Y : 284 bureaux × 3 colonnes — voix Moudenc, Piquemal, non-votants au R2
-Y <- as.matrix(read.csv("notes/Y_bureaux_R2.csv", row.names = 1)[, -1])
+X_tbl <- read_csv("notes/X_bureaux_R1.csv", show_col_types = FALSE) |>
+  select(where(is.numeric))
 
-Y_M   <- Y[, 1]   # voix Moudenc R2 dans chaque bureau
-Y_P   <- Y[, 2]   # voix Piquemal R2
-Y_abs <- Y[, 3]   # non-votants R2
+Y_tbl <- read_csv("notes/Y_bureaux_R2.csv", show_col_types = FALSE) |>
+  select(where(is.numeric))
 
 
 # ── 2. Fusionner Briançon + Piquemal en "UnionGauche" ─────────────────────────
 
 # Ces deux listes ont fusionné pour le R2. Les traiter séparément crée une
-# ambiguïté que les données ne permettent pas de lever.
-X <- cbind(
-  X[, !colnames(X) %in% c("Briancon_PS", "Piquemal_LFI")],
-  UnionGauche = X[, "Briancon_PS"] + X[, "Piquemal_LFI"]
-)
+# ambiguïté que les données ne permettent pas de lever (corrélation r = 0,66).
+
+X_tbl <- X_tbl |>
+  mutate(UnionGauche = Briancon_PS + Piquemal_LFI) |>
+  select(-Briancon_PS, -Piquemal_LFI)
+
 # X a maintenant 10 colonnes au lieu de 11.
+
+# Conversion en matrices pour les opérations algébriques qui suivent
+X     <- as.matrix(X_tbl)
+Y_M   <- Y_tbl |> pull(1)   # voix Moudenc R2 dans chaque bureau
+Y_P   <- Y_tbl |> pull(2)   # voix Piquemal R2
+Y_abs <- Y_tbl |> pull(3)   # non-votants R2
 
 n_bureaux <- nrow(X)   # 284 bureaux de vote
 n_listes  <- ncol(X)   # 10 listes sources
@@ -59,19 +66,23 @@ n_listes  <- ncol(X)   # 10 listes sources
 # En substituant beta_abs = 1 - beta_M - beta_P dans la troisième équation,
 # les 3 × 284 équations se réécrivent comme un seul grand système :
 #
-#   ┌ Y_M    ┐   ┌  X    0  ┐ ┌ beta_M ┐
-#   │ Y_P    │ = │  0    X  │ │ beta_P │
+#   ┌ Y_M    ┐  ┌  X    0  ┐ ┌ beta_M ┐
+#   │ Y_P    │ =│  0    X  │ │ beta_P │
 #   └ Ỹ_abs ┘   └ -X   -X  ┘ └        ┘
 #
 # avec Ỹ_abs = Y_abs - X × 1  (on déplace la constante à droite)
 
-zero <- matrix(0, n_bureaux, n_listes)
+zero <- matrix(0, n_bureaux, n_listes) # matrice de 0 de 284x10
 
 X_aug <- rbind(cbind(X,    zero),   # équation Moudenc
                cbind(zero, X   ),   # équation Piquemal
                cbind(-X,  -X   ))   # équation abstention (après substitution)
 
-y_aug <- c(Y_M, Y_P, Y_abs - X %*% rep(1, n_listes))
+y_aug <- c(
+  Y_M,
+  Y_P,
+  Y_abs - rowSums(X)
+)
 
 
 # ── 4. Mettre en forme pour le solveur QP ─────────────────────────────────────
@@ -120,22 +131,24 @@ beta_abs <- 1 - beta_M - beta_P   # >= 0 garanti par la contrainte (c)
 
 # ── 7. Afficher les résultats ──────────────────────────────────────────────────
 
-cat("=== Taux de report estimés (modèle contraint, UnionGauche) ===\n\n")
-resultat <- data.frame(
+ss_tot <- function(y) sum((y - mean(y))^2)
+
+resultat <- tibble(
   liste      = colnames(X),
   Moudenc    = round(beta_M   * 100, 1),
   Piquemal   = round(beta_P   * 100, 1),
-  Abstention = round(beta_abs * 100, 1)
+  Abstention = round(beta_abs * 100, 1),
+  Somme      = Moudenc + Piquemal + Abstention   # doit être 100 pour chaque ligne
 )
-print(resultat)
- 
-# Vérification : chaque ligne doit sommer à 100 %
-cat("\nSomme par liste (doit être 100 %) :\n")
-print(resultat$Moudenc + resultat$Piquemal + resultat$Abstention)
 
-# Qualité d'ajustement
-ss_tot   <- function(y) sum((y - mean(y))^2)
-cat(sprintf("\nR²  Moudenc : %.3f  |  Piquemal : %.3f  |  Abstention : %.3f\n",
-  1 - sum((Y_M   - X %*% beta_M  )^2) / ss_tot(Y_M),
-  1 - sum((Y_P   - X %*% beta_P  )^2) / ss_tot(Y_P),
-  1 - sum((Y_abs - X %*% beta_abs)^2) / ss_tot(Y_abs)))
+r2 <- tibble(
+  equation  = c("Moudenc", "Piquemal", "Abstention"),
+  R2        = c(
+    1 - sum((Y_M   - X %*% beta_M  )^2) / ss_tot(Y_M),
+    1 - sum((Y_P   - X %*% beta_P  )^2) / ss_tot(Y_P),
+    1 - sum((Y_abs - X %*% beta_abs)^2) / ss_tot(Y_abs)
+  ) |> round(3)
+)
+
+print(resultat)
+print(r2)
