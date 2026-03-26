@@ -462,13 +462,12 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <ul class="sectlevel2">
 <li><a href="#_mise_en_œuvre">6.1. Mise en œuvre</a></li>
 <li><a href="#_coefficients_estimés">6.2. Coefficients estimés</a></li>
-<li><a href="#_reproduire_lestimation">6.3. Reproduire l&#8217;estimation</a></li>
-<li><a href="#_diagramme_de_sankey_des_reports_estimés">6.4. Diagramme de Sankey des reports estimés</a></li>
-<li><a href="#_de_la_régression_aux_27_calcul_détaillé">6.5. De la régression aux 27 % : calcul détaillé</a></li>
-<li><a href="#_les_94_de_mobilisation_en_faveur_de_piquemal_calcul_détaillé">6.6. Les 94 % de mobilisation en faveur de Piquemal : calcul détaillé</a></li>
-<li><a href="#_qualité_dajustement">6.7. Qualité d&#8217;ajustement</a></li>
-<li><a href="#_interprétation">6.8. Interprétation</a></li>
-<li><a href="#_utilisation_dans_le_simulateur">6.9. Utilisation dans le simulateur</a></li>
+<li><a href="#_diagramme_de_sankey_des_reports_estimés">6.3. Diagramme de Sankey des reports estimés</a></li>
+<li><a href="#_de_la_régression_aux_27_calcul_détaillé">6.4. De la régression aux 27 % : calcul détaillé</a></li>
+<li><a href="#_les_94_de_mobilisation_en_faveur_de_piquemal_calcul_détaillé">6.5. Les 94 % de mobilisation en faveur de Piquemal : calcul détaillé</a></li>
+<li><a href="#_qualité_dajustement">6.6. Qualité d&#8217;ajustement</a></li>
+<li><a href="#_tentative_dinterprétation">6.7. Tentative d&#8217;interprétation</a></li>
+<li><a href="#_utilisation_dans_le_simulateur">6.8. Utilisation dans le simulateur</a></li>
 </ul>
 </li>
 <li><a href="#_limite_fondamentale_linférence_écologique">7. Limite fondamentale : l&#8217;inférence écologique</a></li>
@@ -476,6 +475,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <ul class="sectlevel2">
 <li><a href="#_résultats_du_1er_tour_15_mars_2026">8.1. Résultats du 1er tour — 15 mars 2026</a></li>
 <li><a href="#_résultats_du_2nd_tour_22_mars_2026">8.2. Résultats du 2nd tour — 22 mars 2026</a></li>
+<li><a href="#_reproduire_lestimation">8.3. Reproduire l&#8217;estimation</a></li>
 </ul>
 </li>
 <li><a href="#_références">9. Références</a></li>
@@ -504,7 +504,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p>Les données électorales sont <strong>agrégées par bureau de vote</strong>. On observe le nombre de voix pour chaque liste dans chaque bureau, mais pas le comportement individuel des électeurs : on ne sait pas qui a voté pour qui. Par exemple, si la liste A fait 100 voix au 1er tour et 80 voix au 2nd tour, on ne peut pas conclure que 80 % des électeurs A ont voté pour le même candidat au 2nd tour. Certains peuvent être partis vers l&#8217;autre finaliste, ou s&#8217;être abstenus.</p>
 </div>
 <div class="paragraph">
-<p>Pour inférer un comportement individuel (le taux de report) à partir de données agrégées, on utilise une technique classique en sociologie électorale : la <strong>régression écologique</strong> (ou <strong>inférence écologique</strong> <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>). Cette méthode semble être celle utilisée par le CEVIPOF ou encore l&#8217;IFOP pour analyser les reports entre tours.</p>
+<p>Pour inférer un comportement individuel (le taux de report) à partir de données agrégées, on utilise une technique classique en sociologie électorale : la <strong>régression écologique</strong> (ou <strong>inférence écologique</strong> <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>).</p>
 </div>
 </div>
 </div>
@@ -1222,7 +1222,7 @@ print(round(summary(modele)$r.squared, 4))  # 0.99</code></pre>
 </table>
 </div>
 <div class="paragraph">
-<p>La solution analytique — dite <strong>équation normale</strong> — est :</p>
+<p>La solution analytique est :</p>
 </div>
 <div class="stemblock">
 <div class="content">
@@ -1268,9 +1268,6 @@ print(round(summary(modele)$r.squared, 4))  # 0.99</code></pre>
 </tr>
 </table>
 </div>
-<div class="paragraph">
-<p>Avec 284 bureaux et 11 variables, le ratio observations/variables est \(\approx 26\), ce qui garantit une estimation robuste.</p>
-</div>
 </div>
 </div>
 </div>
@@ -1292,7 +1289,7 @@ Contrairement à la formulation initiale en pourcentages, l’estimation finale 
 <div class="sect2">
 <h3 id="_mise_en_œuvre">6.1. Mise en œuvre</h3>
 <div class="paragraph">
-<p>Le modèle a été estimé sur les 284 bureaux de vote de Toulouse (\(n = 284\), \(p = 11\) variables). Les variables explicatives sont les <strong>volumes de voix absolus</strong> au R1 (10 listes + non-votants R1). Le terme « non-votants R1 » joue un rôle analogue à \(\Delta\text{part}_i\) dans la formulation en pourcentages : il permet de capter la mobilisation différentielle entre les deux tours, en attribuant un coefficient aux électeurs qui n&#8217;avaient pas voté au 1er tour. Les variables dépendantes sont les volumes au R2 : voix Moudenc, voix Piquemal, non-votants R2. L&#8217;estimation est réalisée par <code>numpy.linalg.lstsq</code> (MCO sans constante, formulation multi-output).</p>
+<p>Le modèle a été estimé sur les 284 bureaux de vote de Toulouse (\(n = 284\), \(p = 11\) variables). Les variables explicatives sont les <strong>volumes de voix absolus</strong> au R1 (10 listes + non-votants R1). Le terme « non-votants R1 » joue un rôle analogue à \(\Delta\text{part}_i\) dans la formulation en pourcentages : il permet de capter la mobilisation différentielle entre les deux tours, en attribuant un coefficient aux électeurs qui n&#8217;avaient pas voté au 1er tour. Les variables dépendantes sont les volumes au R2 : voix Moudenc, voix Piquemal, non-votants R2.</p>
 </div>
 </div>
 <div class="sect2">
@@ -1408,56 +1405,9 @@ Les trois équations (Moudenc, Piquemal, abstention) sont estimées indépendamm
 </div>
 </div>
 <div class="sect2">
-<h3 id="_reproduire_lestimation">6.3. Reproduire l&#8217;estimation</h3>
+<h3 id="_diagramme_de_sankey_des_reports_estimés">6.3. Diagramme de Sankey des reports estimés</h3>
 <div class="paragraph">
-<p>Les données et le code sont disponibles pour reproduire l&#8217;estimation :</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="X_bureaux_R1.csv">X_bureaux_R1.csv</a> — matrice des variables explicatives (284 bureaux × 11 colonnes : voix R1 par liste + non-votants R1)</p>
-</li>
-<li>
-<p><a href="Y_bureaux_R2.csv">Y_bureaux_R2.csv</a> — matrice des variables dépendantes (284 bureaux × 3 colonnes : voix Moudenc, Piquemal, non-votants R2)</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>Le script R suivant reproduit l&#8217;estimation à partir de ces deux fichiers :</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-r" data-lang="r">#!/usr/bin/env Rscript
-# MCO-elections-toulouse.R
-# Régression écologique MCO multi-output — Toulouse Municipales 2026
-#
-# Usage : Rscript notes/MCO-elections-toulouse.R   (depuis la racine du dépôt)
-#         Rscript MCO-elections-toulouse.R         (depuis notes/)
-
-# ── Lire les données ──────────────────────────────────────────────────────────
-# X : variables explicatives — voix R1 par liste + non-votants R1 (284 bureaux × 11 colonnes)
-# Y : variables dépendantes  — voix R2 Moudenc, Piquemal, non-votants  (284 bureaux × 3 colonnes)
-X &lt;- as.matrix(read.csv("notes/X_bureaux_R1.csv", row.names = 1)[, -1])
-Y &lt;- as.matrix(read.csv("notes/Y_bureaux_R2.csv", row.names = 1)[, -1])
-
-# ── Régression MCO sans constante ─────────────────────────────────────────────
-# Le -1 supprime l'ordonnée à l'origine (équivalent de numpy.linalg.lstsq)
-# Y peut avoir plusieurs colonnes : lm() estime une équation par colonne
-fit &lt;- lm(Y ~ X - 1)
-
-# ── Résultats : coefficients en pourcentages ──────────────────────────────────
-# coef(fit) renvoie une matrice (11 variables × 3 équations)
-# On multiplie par 100 pour lire des pourcentages de report
-beta &lt;- coef(fit)
-rownames(beta) &lt;- colnames(X)   # lm() préfixe "X" automatiquement, on corrige
-print(round(beta * 100, 1))</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_diagramme_de_sankey_des_reports_estimés">6.4. Diagramme de Sankey des reports estimés</h3>
-<div class="paragraph">
-<p>Terminons, par un joli diagramme de Sankey pour visualiser les flux de voix estimés par le modèle. Chaque ruban représente un flux de voix d&#8217;une liste du 1er tour vers un finaliste du 2nd tour ou vers l&#8217;abstention. La largeur de chaque ruban est proportionnelle au volume de voix transférées.</p>
+<p>Terminons, par un joli diagramme de Sankey pour visualiser les flux de voix <strong>estimés</strong> par le modèle. Chaque ruban représente un flux de voix d&#8217;une liste du 1er tour vers un finaliste du 2nd tour ou vers l&#8217;abstention. La largeur de chaque ruban est proportionnelle au volume de voix transférées.</p>
 </div>
 <div class="paragraph">
 <p>Les coefficients hors [0, 1] sont contraints pour la représentation : valeurs négatives ramenées à 0, sommes supérieures à 1 normalisées, résidu affecté à l&#8217;abstention. Les listes en gris ont des coefficients instables (faible volume de voix).</p>
@@ -1469,12 +1419,12 @@ print(round(beta * 100, 1))</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_de_la_régression_aux_27_calcul_détaillé">6.5. De la régression aux 27 % : calcul détaillé</h3>
+<h3 id="_de_la_régression_aux_27_calcul_détaillé">6.4. De la régression aux 27 % : calcul détaillé</h3>
 <div class="paragraph">
 <p>Le chiffre "27 % des électeurs Briançon ont voté Moudenc" est la valeur clé de l&#8217;analyse. Voici comment on y arrive pas à pas.</p>
 </div>
 <div class="sect3">
-<h4 id="_étape_1_lire_les_deux_coefficients_bruts">6.5.1. Étape 1 — lire les deux coefficients bruts</h4>
+<h4 id="_étape_1_lire_les_deux_coefficients_bruts">6.4.1. Étape 1 : lire les deux coefficients bruts</h4>
 <div class="paragraph">
 <p>Au second tour, chaque électeur du 1er tour fait face à exactement <strong>trois issues possibles</strong> : voter Moudenc, voter Piquemal, ou ne pas voter (abstention, blanc, nul). Pour couvrir les trois issues — et notamment estimer le comportement des nouveaux votants entre les deux tours — le modèle estime <strong>simultanément</strong> trois régressions sur les 284 bureaux, avec les mêmes 11 variables explicatives :</p>
 </div>
@@ -1520,23 +1470,7 @@ print(round(beta * 100, 1))</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_étape_2_convertir_en_voix_absolues">6.5.2. Étape 2 — convertir en voix absolues</h4>
-<div class="paragraph">
-<p>Briançon a obtenu <strong>39 245 voix</strong> au 1er tour. On applique les coefficients :</p>
-</div>
-<div class="stemblock">
-<div class="content">
-\[39\,245 \times 0{,}247 \approx 9\,700 \text{ voix} \to \text{Moudenc}\]
-</div>
-</div>
-<div class="stemblock">
-<div class="content">
-\[39\,245 \times 0{,}674 \approx 26\,450 \text{ voix} \to \text{Piquemal}\]
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_étape_3_normaliser_pour_obtenir_un_pourcentage_entre_finalistes">6.5.3. Étape 3 — normaliser pour obtenir un pourcentage entre finalistes</h4>
+<h4 id="_étape_2_normaliser_pour_obtenir_un_pourcentage_entre_finalistes">6.4.2. Étape 2 : normaliser pour obtenir un pourcentage entre finalistes</h4>
 <div class="paragraph">
 <p>Les deux coefficients bruts ne somment pas à 1 (ils somment à \(0{,}247 + 0{,}674 = 0{,}921\)). Pour exprimer la part de chaque finaliste <strong>parmi ceux des électeurs Briançon qui ont effectivement voté au 2nd tour</strong>, on normalise :</p>
 </div>
@@ -1557,33 +1491,20 @@ print(round(beta * 100, 1))</code></pre>
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-Le 27 % affiché dans l&#8217;application est cette valeur normalisée — c&#8217;est la part des électeurs Briançon ayant voté au 2nd tour qui ont choisi Moudenc. Les \(1 - 0{,}247 - 0{,}674 = 0{,}079 \approx 8\,\%\) restants représentent la part non ventilée entre les deux finalistes — résidu du modèle et comportements non captés (blancs, nuls, variation d&#8217;abstention). Ce résidu ne doit pas être interprété comme un flux identifié vers l&#8217;abstention.
+Le 27 % affiché dans l&#8217;application est cette valeur normalisée. Les \(1 - 0{,}247 - 0{,}674 = 0{,}079 \approx 8\,\%\) restants représentent la part non ventilée entre les deux finalistes — résidu du modèle et comportements non captés (blancs, nuls, variation d&#8217;abstention). Ce résidu ne doit pas être interprété comme un flux identifié vers l&#8217;abstention. De même pour les 27 %.
 </td>
 </tr>
 </table>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_résumé_visuel">6.5.4. Résumé visuel</h4>
-<div class="stemblock">
-<div class="content">
-\[\underbrace{39\,245}_{\text{voix Briançon R1}} \longrightarrow
-\begin{cases}
-9\,700 \text{ voix} &amp; \to \text{Moudenc} \quad (27\,\%) \\
-26\,450 \text{ voix} &amp; \to \text{Piquemal} \quad (73\,\%) \\
-\approx 3\,100 \text{ voix} &amp; \to \text{blancs / nuls / résidu} \quad (8\,\%)
-\end{cases}\]
-</div>
-</div>
-</div>
 </div>
 <div class="sect2">
-<h3 id="_les_94_de_mobilisation_en_faveur_de_piquemal_calcul_détaillé">6.6. Les 94 % de mobilisation en faveur de Piquemal : calcul détaillé</h3>
+<h3 id="_les_94_de_mobilisation_en_faveur_de_piquemal_calcul_détaillé">6.5. Les 94 % de mobilisation en faveur de Piquemal : calcul détaillé</h3>
 <div class="paragraph">
-<p>Entre les deux tours, la participation a progressé de +17 017 votants (56,5 % vers 62,6 %). Ces nouveaux votants proviennent nécessairement des non-votants du 1er tour. On applique la même normalisation qu&#8217;à l&#8217;étape 3 ci-dessus, mais cette fois sur la ligne <strong>Non-votants R1</strong> du tableau des coefficients.</p>
+<p>Entre les deux tours, la participation a progressé de +17 017 votants (56,5 % vers 62,6 %). Ces nouveaux votants proviennent nécessairement des non-votants du 1er tour. On applique la même normalisation qu&#8217;à l&#8217;étape 2 ci-dessus, mais cette fois sur la ligne <strong>Non-votants R1</strong> du tableau des coefficients.</p>
 </div>
 <div class="sect3">
-<h4 id="_étape_1_lire_les_coefficients_bruts">6.6.1. Étape 1 — lire les coefficients bruts</h4>
+<h4 id="_étape_1_lire_les_coefficients_bruts">6.5.1. Étape 1 — lire les coefficients bruts</h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -1615,7 +1536,7 @@ Le 27 % affiché dans l&#8217;application est cette valeur normalisée — c&#82
 </div>
 </div>
 <div class="sect3">
-<h4 id="_étape_2_normaliser_entre_les_deux_finalistes">6.6.2. Étape 2 — normaliser entre les deux finalistes</h4>
+<h4 id="_étape_2_normaliser_entre_les_deux_finalistes">6.5.2. Étape 2 — normaliser entre les deux finalistes</h4>
 <div class="paragraph">
 <p>On ne garde que ceux qui <strong>ont effectivement voté</strong> au 2nd tour, en normalisant comme pour Briançon :</p>
 </div>
@@ -1629,22 +1550,6 @@ Le 27 % affiché dans l&#8217;application est cette valeur normalisée — c&#82
 \[\text{Part Moudenc} = \frac{0{,}006}{0{,}091} \approx 6{,}6\,\% \approx 6\,\%\]
 </div>
 </div>
-</div>
-<div class="sect3">
-<h4 id="_étape_3_convertir_en_voix_absolues">6.6.3. Étape 3 — convertir en voix absolues</h4>
-<div class="paragraph">
-<p>On applique ces proportions aux 17 017 votants supplémentaires :</p>
-</div>
-<div class="stemblock">
-<div class="content">
-\[17\,017 \times 93{,}4\,\% \approx 15\,900 \text{ voix} \to \text{Piquemal}\]
-</div>
-</div>
-<div class="stemblock">
-<div class="content">
-\[17\,017 \times 6{,}6\,\% \approx 1\,100 \text{ voix} \to \text{Moudenc}\]
-</div>
-</div>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -1652,7 +1557,7 @@ Le 27 % affiché dans l&#8217;application est cette valeur normalisée — c&#82
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-Cette estimation repose sur une <strong>approximation</strong> : le coefficient MCO décrit le comportement moyen de l&#8217;ensemble des 122 377 non-votants R1, et on l&#8217;applique ici au sous-ensemble des 17 017 qui ont effectivement voté au R2. L&#8217;hypothèse implicite est que ce sous-ensemble se comporte comme la moyenne — ce qui est raisonnable mais non garanti.
+Cette estimation repose sur une <strong>approximation</strong> : le coefficient MCO décrit le comportement moyen de l&#8217;ensemble des 122 377 non-votants R1, et on l&#8217;applique ici au sous-ensemble des 17 017 qui ont effectivement voté au R2. L&#8217;hypothèse implicite est que ce sous-ensemble se comporte comme la moyenne. Ce qui est raisonnable mais non garanti.
 </td>
 </tr>
 </table>
@@ -1660,7 +1565,7 @@ Cette estimation repose sur une <strong>approximation</strong> : le coefficient 
 </div>
 </div>
 <div class="sect2">
-<h3 id="_qualité_dajustement">6.7. Qualité d&#8217;ajustement</h3>
+<h3 id="_qualité_dajustement">6.6. Qualité d&#8217;ajustement</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -1688,7 +1593,7 @@ Cette estimation repose sur une <strong>approximation</strong> : le coefficient 
 </tbody>
 </table>
 <div class="paragraph">
-<p>Les \(R^2\) sont excellents (≥ 0,984), conformes aux benchmarks de la littérature sur les régressions écologiques inter-tours.</p>
+<p>Les \(R^2\) sont excellents (≥ 0,984).</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -1704,7 +1609,7 @@ Dans les régressions écologiques inter-tours, des valeurs élevées de \(R^2\)
 </div>
 </div>
 <div class="sect2">
-<h3 id="_interprétation">6.8. Interprétation</h3>
+<h3 id="_tentative_dinterprétation">6.7. Tentative d&#8217;interprétation</h3>
 <div class="hdlist">
 <table>
 <tr>
@@ -1712,7 +1617,7 @@ Dans les régressions écologiques inter-tours, des valeurs élevées de \(R^2\)
 Piquemal (LFI)
 </td>
 <td class="hdlist2">
-<p>\(\approx 100\,\%\) de fidélité vers l&#8217;union — la fusion LFI a fonctionné.</p>
+<p>\(\approx 100\,\%\) de fidélité vers l&#8217;union, la fusion côté LFI a fonctionné.</p>
 </td>
 </tr>
 <tr>
@@ -1720,7 +1625,7 @@ Piquemal (LFI)
 Briançon (PS)
 </td>
 <td class="hdlist2">
-<p>\(73\,\%\) vers Piquemal, \(27\,\%\) vers Moudenc — fuite notable du PS vers la droite.</p>
+<p>\(73\,\%\) vers Piquemal, \(27\,\%\) vers Moudenc, fuite notable du PS.</p>
 </td>
 </tr>
 <tr>
@@ -1736,7 +1641,7 @@ Moudenc (DVD)
 Leonardelli (RN)
 </td>
 <td class="hdlist2">
-<p>\(\approx 100\,\%\) vers Moudenc — report quasi-total de l&#8217;électorat RN vers la droite.</p>
+<p>\(\approx 100\,\%\) vers Moudenc. Report quasi-total de l&#8217;électorat RN vers la droite.</p>
 </td>
 </tr>
 <tr>
@@ -1752,7 +1657,7 @@ Meilhac
 Non-votants R1
 </td>
 <td class="hdlist2">
-<p>\(91\,\%\) restent abstenants au R2 — la mobilisation inter-tours a principalement joué sur les anciens votants.</p>
+<p>\(91\,\%\) restent abstenants au R2. Comme vu, selon le modèle, les 9 % qui se mobilisent au R2 voteraient à 94 % pour Piquemal et à 6 % pour Moudenc.</p>
 </td>
 </tr>
 <tr>
@@ -1767,7 +1672,7 @@ Petites listes
 </div>
 </div>
 <div class="sect2">
-<h3 id="_utilisation_dans_le_simulateur">6.9. Utilisation dans le simulateur</h3>
+<h3 id="_utilisation_dans_le_simulateur">6.8. Utilisation dans le simulateur</h3>
 <div class="paragraph">
 <p>Les coefficients des listes robustes (Briançon, Moudenc, Piquemal, Leonardelli, Meilhac) sont utilisés comme <strong>valeurs par défaut des curseurs</strong> du simulateur de report intégré à la carte. Les petites listes conservent une valeur par défaut de 50 %.</p>
 </div>
@@ -1778,7 +1683,7 @@ Petites listes
 <h2 id="_limite_fondamentale_linférence_écologique">7. Limite fondamentale : l&#8217;inférence écologique</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>L'<strong>ecological fallacy</strong> (paradoxe de Robinson, 1950) désigne l&#8217;erreur qui consiste à inférer un comportement individuel à partir de corrélations agrégées.</p>
+<p>L'<strong>ecological fallacy</strong> (<a href="https://fr.wikipedia.org/wiki/Erreur_%C3%A9cologique">paradoxe de Robinson, 1950</a>) désigne l&#8217;erreur qui consiste à inférer un comportement individuel à partir de corrélations agrégées.</p>
 </div>
 <div class="paragraph">
 <p><strong>Exemple</strong> : si les bureaux où Leonardelli est fort au 1er tour montrent un score Moudenc plus élevé au 2nd tour, cela ne prouve pas que les électeurs Leonardelli <strong>individuellement</strong> ont voté Moudenc. Un troisième facteur géographique pourrait expliquer les deux.</p>
@@ -1787,7 +1692,7 @@ Petites listes
 <p><strong>Ce que le modèle dit</strong> : les \(\beta_k\) sont des estimations de reports moyens agrégés, valides sous hypothèse forte d’homogénéité du comportement entre bureaux. En présence d’hétérogénéité non observée, ils peuvent être biaisés (ecological fallacy).</p>
 </div>
 <div class="paragraph">
-<p>Avec 284 bureaux couvrant des géographies très diverses (centre, périphérie nord, Mirail, quartiers résidentiels), l&#8217;hypothèse d&#8217;homogénéité est raisonnablement satisfaite.</p>
+<p>Avec 284 bureaux couvrant des géographies très diverses (centre, périphérie nord, Mirail, quartiers résidentiels), l&#8217;hypothèse d&#8217;homogénéité me semble raisonnablement satisfaite.</p>
 </div>
 </div>
 </div>
@@ -1926,6 +1831,53 @@ Petites listes
 La participation a progressé de +6,1 points par rapport au 1er tour (56,5 % → 62,6 %), soit +17 017 votants supplémentaires en valeur absolue.</p>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_reproduire_lestimation">8.3. Reproduire l&#8217;estimation</h3>
+<div class="paragraph">
+<p>Les données et le code sont disponibles pour reproduire l&#8217;estimation :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="X_bureaux_R1.csv">X_bureaux_R1.csv</a> — matrice des variables explicatives (284 bureaux × 11 colonnes : voix R1 par liste + non-votants R1)</p>
+</li>
+<li>
+<p><a href="Y_bureaux_R2.csv">Y_bureaux_R2.csv</a> — matrice des variables dépendantes (284 bureaux × 3 colonnes : voix Moudenc, Piquemal, non-votants R2)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Le script R suivant reproduit l&#8217;estimation à partir de ces deux fichiers :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-r" data-lang="r">#!/usr/bin/env Rscript
+# MCO-elections-toulouse.R
+# Régression écologique MCO multi-output — Toulouse Municipales 2026
+#
+# Usage : Rscript notes/MCO-elections-toulouse.R   (depuis la racine du dépôt)
+#         Rscript MCO-elections-toulouse.R         (depuis notes/)
+
+# ── Lire les données ──────────────────────────────────────────────────────────
+# X : variables explicatives — voix R1 par liste + non-votants R1 (284 bureaux × 11 colonnes)
+# Y : variables dépendantes  — voix R2 Moudenc, Piquemal, non-votants  (284 bureaux × 3 colonnes)
+X &lt;- as.matrix(read.csv("notes/X_bureaux_R1.csv", row.names = 1)[, -1])
+Y &lt;- as.matrix(read.csv("notes/Y_bureaux_R2.csv", row.names = 1)[, -1])
+
+# ── Régression MCO sans constante ─────────────────────────────────────────────
+# Le -1 supprime l'ordonnée à l'origine (équivalent de numpy.linalg.lstsq)
+# Y peut avoir plusieurs colonnes : lm() estime une équation par colonne
+fit &lt;- lm(Y ~ X - 1)
+
+# ── Résultats : coefficients en pourcentages ──────────────────────────────────
+# coef(fit) renvoie une matrice (11 variables × 3 équations)
+# On multiplie par 100 pour lire des pourcentages de report
+beta &lt;- coef(fit)
+rownames(beta) &lt;- colnames(X)   # lm() préfixe "X" automatiquement, on corrige
+print(round(beta * 100, 1))</code></pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -1955,7 +1907,7 @@ La participation a progressé de +6,1 points par rapport au 1er tour (56,5 % →
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-03-24 21:01:15 +0100
+Last updated 2026-03-26 21:18:02 +0100
 </div>
 </div>
 <script type="text/x-mathjax-config">
